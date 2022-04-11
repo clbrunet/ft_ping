@@ -1,21 +1,28 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
+#include <errno.h>
 #include <sys/socket.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+void print_error(const char *executable, const char *error_title, const char *error_description)
+{
+	fprintf(stderr, "%s: %s: %s\n", executable, error_title, error_description);
+}
+
 int main (int argc, char *argv[])
 {
 	if (argc == 1) {
-		fprintf(stderr, "ft_ping: usage error: Destination address required\n");
+		print_error(argv[0], "usage error", "Destination address required");
 		return 1;
 	}
 
 	int socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (socket_fd == -1) {
-		perror("socket");
+		print_error(argv[0], "socket", strerror(errno));
 		return 2;
 	}
 
@@ -28,7 +35,7 @@ int main (int argc, char *argv[])
 			close(socket_fd);
 			return 2;
 		case -1:
-			perror("inet_pton");
+			print_error(argv[0], "inet_pton", strerror(errno));
 			close(socket_fd);
 			return 2;
 	}
@@ -42,7 +49,7 @@ int main (int argc, char *argv[])
 
 	if (sendto(socket_fd, buf, sizeof(buf), 0,
 			(struct sockaddr *)&sockaddr_in, sizeof(struct sockaddr_in)) == -1) {
-		perror("sendto");
+		print_error(argv[0], "sendto", strerror(errno));
 		close(socket_fd);
 		return 2;
 	}
