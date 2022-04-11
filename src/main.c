@@ -13,7 +13,7 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-	int socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+	int socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (socket_fd == -1) {
 		perror("socket");
 		return 2;
