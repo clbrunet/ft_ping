@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/in.h>
@@ -44,8 +45,16 @@ int main (int argc, char *argv[])
 	struct icmphdr *icmp_header = (struct icmphdr *)buf;
 	icmp_header->type = ICMP_ECHO;
 	icmp_header->code = 0;
+
+	if (56 > sizeof(struct timeval)) {
+		if (gettimeofday((struct timeval *)(buf + sizeof(struct icmphdr)), NULL) == -1) {
+			print_error(argv[0], "gettimeofday", strerror(errno));
+			close(socket_fd);
+			return 2;
+		}
+	}
+
 	// TODO: icmp_header->checksum
-	// TODO: data
 
 	if (sendto(socket_fd, buf, sizeof(buf), 0,
 			(struct sockaddr *)&sockaddr_in, sizeof(struct sockaddr_in)) == -1) {
