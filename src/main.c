@@ -9,9 +9,33 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-void print_error(const char *executable, const char *error_title, const char *error_description)
+static void print_error(const char *executable, const char *error_title, const char *error_description)
 {
 	fprintf(stderr, "%s: %s: %s\n", executable, error_title, error_description);
+}
+
+static uint16_t get_checksum(void *addr, size_t size)
+{
+  uint32_t sum = 0;
+  size_t remaining_bytes_count = size;
+  uint16_t *iter = addr;
+
+  while (remaining_bytes_count >= 2) {
+    sum += *iter;
+    if (sum > 0xffff) {
+      sum -= 0xffff;
+    }
+    iter++;
+    remaining_bytes_count -= 2;
+  }
+
+  if (remaining_bytes_count == 1) {
+    sum += *(uint8_t *)iter;
+    if (sum > 0xffff) {
+      sum -= 0xffff;
+    }
+  }
+  return ~sum;
 }
 
 int main (int argc, char *argv[])
@@ -54,7 +78,7 @@ int main (int argc, char *argv[])
 		}
 	}
 
-	// TODO: icmp_header->checksum
+	icmp_header->checksum = get_checksum(buf, sizeof(struct icmphdr) + 56);
 
 	if (sendto(socket_fd, buf, sizeof(buf), 0,
 			(struct sockaddr *)&sockaddr_in, sizeof(struct sockaddr_in)) == -1) {
