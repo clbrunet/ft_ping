@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "ft_ping/checksum.h"
+
 uint16_t get_checksum(void *addr, size_t size)
 {
 	assert(addr != NULL);

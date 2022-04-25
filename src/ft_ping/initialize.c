@@ -7,6 +7,7 @@
 #include <netinet/ip_icmp.h>
 #include <arpa/inet.h>
 
+#include "ft_ping/initialize.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/checksum.h"
 
@@ -37,7 +38,8 @@ int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *destinat
 	return 0;
 }
 
-int initialize_icmp_echo(uint8_t **icmp_echo_ptr, size_t packet_size, const char *executable)
+int initialize_icmp_echo(uint8_t **icmp_echo_ptr, size_t packet_size,
+		uint16_t id, uint16_t sequence, const char *executable)
 {
 	assert(icmp_echo_ptr != NULL);
 	assert(executable != NULL);
@@ -50,6 +52,8 @@ int initialize_icmp_echo(uint8_t **icmp_echo_ptr, size_t packet_size, const char
 	struct icmphdr *icmp_header = (struct icmphdr *)*icmp_echo_ptr;
 	icmp_header->type = ICMP_ECHO;
 	icmp_header->code = 0;
+	icmp_header->un.echo.id = id;
+	icmp_header->un.echo.sequence = sequence;
 
 	if (packet_size >= sizeof(struct timeval)) {
 		if (gettimeofday((struct timeval *)(icmp_header + 1), NULL) == -1) {
