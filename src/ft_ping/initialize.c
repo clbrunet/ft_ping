@@ -55,14 +55,20 @@ int initialize_icmp_echo(uint8_t **icmp_echo_ptr, size_t packet_size,
 	icmp_header->un.echo.id = id;
 	icmp_header->un.echo.sequence = sequence;
 
+	uint8_t *packet = (uint8_t *)(icmp_header + 1);
+	int packet_pad_bytes_begin_index = 0;
 	if (packet_size >= sizeof(struct timeval)) {
-		if (gettimeofday((struct timeval *)(icmp_header + 1), NULL) == -1) {
+		if (gettimeofday((struct timeval *)(packet), NULL) == -1) {
 			print_error(executable, "gettimeofday", strerror(errno));
 			free(*icmp_echo_ptr);
 			return 2;
 		}
+		packet_pad_bytes_begin_index += sizeof(struct timeval);
+	}
+	for (size_t i = packet_pad_bytes_begin_index; i < packet_size; i++) {
+		packet[i] = (uint8_t)i;
 	}
 
-	icmp_header->checksum = get_checksum(*icmp_echo_ptr, sizeof(struct icmphdr) + 56);
+	icmp_header->checksum = get_checksum(*icmp_echo_ptr, sizeof(struct icmphdr) + packet_size);
 	return 0;
 }
