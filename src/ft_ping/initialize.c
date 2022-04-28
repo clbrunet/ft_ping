@@ -45,13 +45,13 @@ int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *destinat
 	return 0;
 }
 
-int initialize_icmp_packet(uint8_t *icmp_packet, size_t payload_size,
+int initialize_icmp_echo_packet(uint8_t *icmp_echo_packet, size_t payload_size,
 		uint16_t id, uint16_t sequence, const char *executable)
 {
-	assert(icmp_packet != NULL);
+	assert(icmp_echo_packet != NULL);
 	assert(executable != NULL);
 
-	struct icmphdr *icmphdr = (struct icmphdr *)icmp_packet;
+	struct icmphdr *icmphdr = (struct icmphdr *)icmp_echo_packet;
 	icmphdr->type = ICMP_ECHO;
 	icmphdr->code = 0;
 	icmphdr->checksum = 0;

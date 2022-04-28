@@ -6,7 +6,8 @@ BUILD_DIR := ./build
 CC := clang
 CFLAGS := -Wall -Wextra -Werror
 CFLAGS += -I./src/
-CFLAGS += -g3 -fsanitize=address
+CFLAGS += -g3
+# CFLAGS += -fsanitize=address
 # CFLAGS += -DNDEBUG
 
 SRCS := $(shell find $(SRCS_DIR) -type f -name "*.$(SRCS_EXTENSION)")
