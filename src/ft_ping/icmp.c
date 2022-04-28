@@ -1,10 +1,14 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <sys/time.h>
 #include <string.h>
 #include <errno.h>
 #include <netinet/ip_icmp.h>
 
+#include "ft_ping/icmp.h"
+#include "ft_ping/main.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/checksum.h"
 
@@ -38,4 +42,17 @@ uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size
 
 	icmphdr->checksum = get_checksum(icmphdr, sizeof(struct icmphdr) + payload_size);
 	return icmp_request;
+}
+
+int send_icmp_request(void)
+{
+	if (sendto(g_vars.socket_fd, g_vars.icmp_request,
+			sizeof(struct icmphdr) + g_vars.icmp_request_payload_size, 0,
+			(const struct sockaddr *)&g_vars.destination_sockaddr_in, sizeof(struct sockaddr_in))
+		== -1) {
+		print_error("sendto", strerror(errno));
+		return -1;
+	}
+	printf("ICMP ECHO REQUEST sent\n");
+	return 0;
 }

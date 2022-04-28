@@ -13,13 +13,16 @@
 #include "ft_ping/main.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/initialize.h"
+#include "ft_ping/icmp.h"
 
 variables_t g_vars = {0};
 
 void int_handler(int signum)
 {
 	(void)signum;
+
 	write(STDOUT_FILENO, "\nEND\n", 5);
+
 	free(g_vars.icmp_request);
 	close(g_vars.socket_fd);
 	exit(0);
@@ -32,23 +35,21 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	g_vars.program_name = argv[0];
+
 	if (argc < 2) {
 		print_error("usage error", "Destination address required");
 		return 1;
 	}
+
 	if (initialize(argv[1]) == -1) {
 		return 2;
 	}
-	if (sendto(g_vars.socket_fd, g_vars.icmp_request,
-			sizeof(struct icmphdr) + g_vars.icmp_request_payload_size, 0,
-			(const struct sockaddr *)&g_vars.destination_sockaddr_in, sizeof(struct sockaddr_in))
-		== -1) {
-		print_error("sendto", strerror(errno));
+
+	if (send_icmp_request() == -1) {
 		free(g_vars.icmp_request);
 		close(g_vars.socket_fd);
 		return 2;
 	}
-	printf("ICMP ECHO REQUEST sent\n");
 
 	signal(SIGINT, &int_handler);
 
