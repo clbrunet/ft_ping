@@ -27,37 +27,23 @@ void int_handler(int signum)
 
 int main(int argc, char *argv[])
 {
-	if (argc == 1) {
-		print_error(argv[0], "usage error", "Destination address required");
+	if (argc < 1) {
+		fprintf(stderr, "argv must be filled\n");
 		return 1;
 	}
-	if (initialize_socket(&g_vars.socket_fd, argv[0]) == -1) {
+	g_vars.program_name = argv[0];
+	if (argc < 2) {
+		print_error("usage error", "Destination address required");
+		return 1;
+	}
+	if (initialize(argv[1]) == -1) {
 		return 2;
 	}
-	if (initialize_sockaddr_in(&g_vars.destination_sockaddr_in, argv[1], argv[0]) == -1) {
-		close(g_vars.socket_fd);
-		return 2;
-	}
-	g_vars.icmp_request_id = getpid() & UINT16_MAX;
-	g_vars.icmp_request_payload_size = 56;
-	g_vars.icmp_request = malloc(sizeof(struct icmphdr) + g_vars.icmp_request_payload_size);
-	if (g_vars.icmp_request == NULL) {
-		print_error(argv[0], "malloc", strerror(errno));
-		close(g_vars.socket_fd);
-		return 2;
-	}
-	if (initialize_icmp_request(g_vars.icmp_request,
-			g_vars.icmp_request_payload_size, g_vars.icmp_request_id, 1, argv[0]) == -1) {
-		free(g_vars.icmp_request);
-		close(g_vars.socket_fd);
-		return 2;
-	}
-
 	if (sendto(g_vars.socket_fd, g_vars.icmp_request,
 			sizeof(struct icmphdr) + g_vars.icmp_request_payload_size, 0,
 			(const struct sockaddr *)&g_vars.destination_sockaddr_in, sizeof(struct sockaddr_in))
 		== -1) {
-		print_error(argv[0], "sendto", strerror(errno));
+		print_error("sendto", strerror(errno));
 		free(g_vars.icmp_request);
 		close(g_vars.socket_fd);
 		return 2;
@@ -75,11 +61,10 @@ int main(int argc, char *argv[])
 		.msg_iov = msg_iov,
 		.msg_iovlen = 1,
 	};
-
 	while (true) {
 		ssize_t ret = recvmsg(g_vars.socket_fd, &msg, 0);
 		if (ret == -1) {
-			print_error(argv[0], "recvmsg", strerror(errno));
+			print_error("recvmsg", strerror(errno));
 			free(g_vars.icmp_request);
 			close(g_vars.socket_fd);
 			return 2;
