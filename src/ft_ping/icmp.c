@@ -29,7 +29,7 @@ uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size
 	uint8_t *payload = (uint8_t *)(icmphdr + 1);
 	int payload_pad_bytes_begin_index = 0;
 	if (payload_size >= sizeof(struct timeval)) {
-		if (gettimeofday((struct timeval *)(payload), NULL) == -1) {
+		if (gettimeofday((struct timeval *)payload, NULL) == -1) {
 			print_error("gettimeofday", strerror(errno));
 			free(icmp_request);
 			return NULL;
@@ -42,6 +42,26 @@ uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size
 
 	icmphdr->checksum = get_checksum(icmphdr, sizeof(struct icmphdr) + payload_size);
 	return icmp_request;
+}
+
+int update_icmp_request(void)
+{
+	struct icmphdr *icmphdr = (struct icmphdr *)g_vars.icmp_request;
+	assert(icmphdr->type == ICMP_ECHO);
+	assert(icmphdr->code == 0);
+	icmphdr->un.echo.sequence++;
+
+	uint8_t *payload = (uint8_t *)(icmphdr + 1);
+	if (g_vars.icmp_request_payload_size >= sizeof(struct timeval)) {
+		if (gettimeofday((struct timeval *)payload, NULL) == -1) {
+			print_error("gettimeofday", strerror(errno));
+			return -1;
+		}
+	}
+
+	icmphdr->checksum = 0;
+	icmphdr->checksum = get_checksum(icmphdr, sizeof(struct icmphdr) + g_vars.icmp_request_payload_size);
+	return 0;
 }
 
 int send_icmp_request(void)

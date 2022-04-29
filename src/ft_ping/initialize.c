@@ -54,7 +54,7 @@ int initialize(const char *destination)
 	}
 	g_vars.icmp_request_id = getpid() & UINT16_MAX;
 	g_vars.icmp_request_payload_size = 56;
-	g_vars.icmp_request = create_icmp_request(g_vars.icmp_request_id, 1,
+	g_vars.icmp_request = create_icmp_request(g_vars.icmp_request_id, 0,
 			g_vars.icmp_request_payload_size);
 	if (g_vars.icmp_request == NULL) {
 		close(g_vars.socket_fd);

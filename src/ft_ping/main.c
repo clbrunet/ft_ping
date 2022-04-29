@@ -32,6 +32,7 @@ static void alarm_handler(int signum)
 {
 	(void)signum;
 
+	update_icmp_request();
 	if (send_icmp_request() == -1) {
 		terminate();
 		exit(2);
@@ -69,6 +70,11 @@ static int recv_loop(void)
 		printf("checksum %hu\n", response_icmphdr->checksum);
 		printf("id %hu or %hu\n", response_icmphdr->un.echo.id, ntohs(response_icmphdr->un.echo.id));
 		printf("seq %hu or %hu\n", response_icmphdr->un.echo.sequence, ntohs(response_icmphdr->un.echo.sequence));
+		struct timeval *tm = (struct timeval *)(response_icmphdr + 1);
+		long sec = tm->tv_sec % 60;
+		long min = tm->tv_sec / 60 % 60;
+		long hour = tm->tv_sec / 60 / 60 % 24;
+		printf("UTC time : %ld:%ld.%ld\n", hour, min, sec);
 	}
 }
 
@@ -92,11 +98,7 @@ int main(int argc, char *argv[])
 	signal(SIGINT, &interrupt_handler);
 	signal(SIGALRM, &alarm_handler);
 
-	if (send_icmp_request() == -1) {
-		terminate();
-		return 2;
-	}
-	alarm(1);
+	alarm_handler(SIGALRM);
 
 	if (recv_loop() == -1) {
 		terminate();

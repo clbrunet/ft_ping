@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size);
+int update_icmp_request(void);
 int send_icmp_request(void);
 
 #endif
