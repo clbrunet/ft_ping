@@ -14,18 +14,29 @@
 #include "ft_ping/utils/print.h"
 #include "ft_ping/initialize.h"
 #include "ft_ping/icmp.h"
+#include "ft_ping/terminate.h"
 
 variables_t g_vars = {0};
 
-static void int_handler(int signum)
+static void interrupt_handler(int signum)
 {
 	(void)signum;
 
 	write(STDOUT_FILENO, "\nEND\n", 5);
 
-	free(g_vars.icmp_request);
-	close(g_vars.socket_fd);
+	terminate();
 	exit(0);
+}
+
+static void alarm_handler(int signum)
+{
+	(void)signum;
+
+	if (send_icmp_request() == -1) {
+		terminate();
+		exit(2);
+	}
+	alarm(1);
 }
 
 static int recv_loop(void)
@@ -78,17 +89,17 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 
-	signal(SIGINT, &int_handler);
+	signal(SIGINT, &interrupt_handler);
+	signal(SIGALRM, &alarm_handler);
 
 	if (send_icmp_request() == -1) {
-		free(g_vars.icmp_request);
-		close(g_vars.socket_fd);
+		terminate();
 		return 2;
 	}
+	alarm(1);
 
 	if (recv_loop() == -1) {
-		free(g_vars.icmp_request);
-		close(g_vars.socket_fd);
+		terminate();
 		return 2;
 	}
 	return 0;
