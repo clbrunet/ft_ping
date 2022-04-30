@@ -1,4 +1,6 @@
+#include <netinet/ip_icmp.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -57,6 +59,14 @@ int initialize(const char *destination)
 	g_vars.icmp_request = create_icmp_request(g_vars.icmp_request_id, 0,
 			g_vars.icmp_request_payload_size);
 	if (g_vars.icmp_request == NULL) {
+		close(g_vars.socket_fd);
+		return 2;
+	}
+	g_vars.icmp_reply_buf_size = sizeof(struct icmphdr) + sizeof(struct icmphdr)
+		+ g_vars.icmp_request_payload_size + 1;
+	g_vars.icmp_reply_buf = malloc(g_vars.icmp_reply_buf_size);
+	if (g_vars.icmp_reply_buf == NULL) {
+		free(g_vars.icmp_request);
 		close(g_vars.socket_fd);
 		return 2;
 	}

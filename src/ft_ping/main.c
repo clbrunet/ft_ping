@@ -42,10 +42,9 @@ static void alarm_handler(int signum)
 
 static int recv_loop(void)
 {
-	uint8_t msg_iov_base_buf[1000]; // TODO malloc
 	struct iovec msg_iov[1] = {
-		[0].iov_base = msg_iov_base_buf,
-		[0].iov_len = 1000,
+		[0].iov_base = g_vars.icmp_reply_buf,
+		[0].iov_len = g_vars.icmp_reply_buf_size,
 	};
 	struct msghdr msg = {
 		.msg_iov = msg_iov,
@@ -58,12 +57,12 @@ static int recv_loop(void)
 			return -1;
 		}
 		printf("\nMessage received\n");
-		print_memory(msg_iov_base_buf, ret);
-		struct iphdr *response_iphdr = (void *)msg_iov_base_buf;
+		print_memory(g_vars.icmp_reply_buf, ret);
+		struct iphdr *response_iphdr = (void *)g_vars.icmp_reply_buf;
 		printf("IP header\n");
 		printf("saddr %u\n", response_iphdr->saddr);
 		printf("daddr %u\n", response_iphdr->daddr);
-		struct icmphdr *response_icmphdr = (void *)msg_iov_base_buf + 20;
+		struct icmphdr *response_icmphdr = (void *)g_vars.icmp_reply_buf + 20;
 		printf("ICMP header\n");
 		printf("type %hhu\n", response_icmphdr->type);
 		printf("code %hhu\n", response_icmphdr->code);

@@ -6,6 +6,10 @@
 
 void terminate(void)
 {
+	free(g_vars.icmp_reply_buf);
+	g_vars.icmp_reply_buf = NULL;
 	free(g_vars.icmp_request);
+	g_vars.icmp_request = NULL;
 	close(g_vars.socket_fd);
+	g_vars.socket_fd = -1;
 }
