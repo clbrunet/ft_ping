@@ -1,9 +1,11 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "ft_ping/main.h"
 #include "ft_ping/utils/print.h"
+#include "ft_ping/utils/string.h"
 
 void print_error(const char *error_title, const char *error_description)
 {
@@ -11,7 +13,12 @@ void print_error(const char *error_title, const char *error_description)
 	assert(error_title != NULL);
 	assert(error_description != NULL);
 
-	fprintf(stderr, "%s: %s: %s\n", g_vars.program_name, error_title, error_description);
+	write(STDERR_FILENO, g_vars.program_name, ft_strlen(g_vars.program_name));
+	write(STDERR_FILENO, ": ", 2);
+	write(STDERR_FILENO, error_title, ft_strlen(error_title));
+	write(STDERR_FILENO, ": ", 2);
+	write(STDERR_FILENO, error_description, ft_strlen(error_description));
+	write(STDERR_FILENO, "\n ", 1);
 }
 
 void print_memory(const uint8_t *address, size_t size)
