@@ -73,7 +73,7 @@ static int recv_loop(void)
 		long sec = tm->tv_sec % 60;
 		long min = tm->tv_sec / 60 % 60;
 		long hour = tm->tv_sec / 60 / 60 % 24;
-		printf("UTC time : %ld:%ld.%ld\n", hour, min, sec);
+		printf("UTC time : %02ld:%02ld.%02ld\n", hour, min, sec);
 	}
 }
 

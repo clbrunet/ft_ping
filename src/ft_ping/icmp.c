@@ -68,8 +68,8 @@ int send_icmp_request(void)
 {
 	if (sendto(g_vars.socket_fd, g_vars.icmp_request,
 			sizeof(struct icmphdr) + g_vars.icmp_request_payload_size, 0,
-			(const struct sockaddr *)&g_vars.destination_sockaddr_in, sizeof(struct sockaddr_in))
-		== -1) {
+			(const struct sockaddr *)&g_vars.destination_sockaddr_in,
+			sizeof(struct sockaddr_in)) == -1) {
 		print_error("sendto", strerror(errno));
 		return -1;
 	}

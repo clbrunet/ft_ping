@@ -48,11 +48,11 @@ int initialize(const char *destination)
 	assert(destination != NULL);
 
 	if (initialize_socket(&g_vars.socket_fd) == -1) {
-		return 2;
+		return -1;
 	}
 	if (initialize_sockaddr_in(&g_vars.destination_sockaddr_in, destination) == -1) {
 		close(g_vars.socket_fd);
-		return 2;
+		return -1;
 	}
 	g_vars.icmp_request_id = getpid() & UINT16_MAX;
 	g_vars.icmp_request_payload_size = 56;
@@ -60,7 +60,7 @@ int initialize(const char *destination)
 			g_vars.icmp_request_payload_size);
 	if (g_vars.icmp_request == NULL) {
 		close(g_vars.socket_fd);
-		return 2;
+		return -1;
 	}
 	g_vars.icmp_reply_buf_size = sizeof(struct icmphdr) + sizeof(struct icmphdr)
 		+ g_vars.icmp_request_payload_size + 1;
@@ -68,7 +68,7 @@ int initialize(const char *destination)
 	if (g_vars.icmp_reply_buf == NULL) {
 		free(g_vars.icmp_request);
 		close(g_vars.socket_fd);
-		return 2;
+		return -1;
 	}
 	return 0;
 }
