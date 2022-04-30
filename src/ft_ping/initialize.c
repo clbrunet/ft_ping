@@ -1,3 +1,4 @@
+#include <netinet/in.h>
 #include <netinet/ip_icmp.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,9 +7,13 @@
 #include <string.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 #include "ft_ping/initialize.h"
 #include "ft_ping/main.h"
+#include "ft_ping/utils/error.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/icmp.h"
 
@@ -29,17 +34,19 @@ static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *d
 	assert(sockaddr_in != NULL);
 	assert(destination != NULL);
 
-	*sockaddr_in = (struct sockaddr_in){0};
-	sockaddr_in->sin_family = AF_INET;
-	switch (inet_pton(AF_INET, destination, &sockaddr_in->sin_addr)) {
-		case 0:
-			// TODO: inet_pton src problem
-			fprintf(stderr, "inet_pton src problem\n");
-			return -1;
-		case -1:
-			print_error("inet_pton", strerror(errno));
-			return -1;
-	}
+	struct addrinfo hints = {
+		.ai_family = AF_INET,
+		.ai_socktype = SOCK_RAW,
+		.ai_protocol = IPPROTO_ICMP,
+	};
+	struct addrinfo *res;
+	int error_code = getaddrinfo(destination, NULL, &hints, &res);
+	if (error_code != 0) {
+		print_error("getaddrinfo", ft_gai_strerror(error_code));
+		return -1;
+    }
+	*sockaddr_in = *(struct sockaddr_in *)res->ai_addr;
+	freeaddrinfo(res);
 	return 0;
 }
 
