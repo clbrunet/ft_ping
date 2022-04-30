@@ -12,6 +12,7 @@
 
 #include "ft_ping/main.h"
 #include "ft_ping/utils/print.h"
+#include "ft_ping/utils/error.h"
 #include "ft_ping/initialize.h"
 #include "ft_ping/icmp.h"
 #include "ft_ping/terminate.h"
@@ -53,7 +54,7 @@ static int recv_loop(void)
 	while (true) {
 		ssize_t ret = recvmsg(g_vars.socket_fd, &msg, 0);
 		if (ret == -1) {
-			print_error("recvmsg", strerror(errno));
+			print_error("recvmsg", ft_strerror(errno));
 			return -1;
 		}
 		printf("\nMessage received\n");
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 	g_vars.program_name = argv[0];
 
 	if (argc < 2) {
-		print_error("usage error", "Destination address required");
+		print_error("usage error", ft_strerror(EDESTADDRREQ));
 		return 1;
 	}
 

@@ -23,7 +23,7 @@ static int initialize_socket(int *socket_fd)
 
 	*socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (*socket_fd == -1) {
-		print_error("socket", strerror(errno));
+		print_error("socket", ft_strerror(errno));
 		return -1;
 	}
 	return 0;
