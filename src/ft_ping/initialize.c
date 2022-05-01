@@ -29,10 +29,10 @@ static int initialize_socket(int *socket_fd)
 	return 0;
 }
 
-static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *destination)
+static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *destination_arg)
 {
 	assert(sockaddr_in != NULL);
-	assert(destination != NULL);
+	assert(destination_arg != NULL);
 
 	struct addrinfo hints = {
 		.ai_family = AF_INET,
@@ -40,9 +40,9 @@ static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *d
 		.ai_protocol = IPPROTO_ICMP,
 	};
 	struct addrinfo *res;
-	int error_code = getaddrinfo(destination, NULL, &hints, &res);
+	int error_code = getaddrinfo(destination_arg, NULL, &hints, &res);
 	if (error_code != 0) {
-		print_error("getaddrinfo", ft_gai_strerror(error_code));
+		print_error(destination_arg, ft_gai_strerror(error_code));
 		return -1;
     }
 	*sockaddr_in = *(struct sockaddr_in *)res->ai_addr;
@@ -50,14 +50,14 @@ static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *d
 	return 0;
 }
 
-int initialize(const char *destination)
+int initialize(const char *destination_arg)
 {
-	assert(destination != NULL);
+	assert(destination_arg != NULL);
 
 	if (initialize_socket(&g_vars.socket_fd) == -1) {
 		return -1;
 	}
-	if (initialize_sockaddr_in(&g_vars.destination_sockaddr_in, destination) == -1) {
+	if (initialize_sockaddr_in(&g_vars.destination_sockaddr_in, destination_arg) == -1) {
 		close(g_vars.socket_fd);
 		return -1;
 	}
@@ -69,8 +69,8 @@ int initialize(const char *destination)
 		close(g_vars.socket_fd);
 		return -1;
 	}
-	g_vars.icmp_reply_buf_size = sizeof(struct icmphdr) + sizeof(struct icmphdr)
-		+ g_vars.icmp_request_payload_size + 1;
+	g_vars.icmp_reply_buf_size
+		= IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size)) + 1;
 	g_vars.icmp_reply_buf = malloc(g_vars.icmp_reply_buf_size);
 	if (g_vars.icmp_reply_buf == NULL) {
 		free(g_vars.icmp_request);

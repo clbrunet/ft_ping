@@ -15,7 +15,7 @@
 
 uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size)
 {
-	uint8_t *icmp_request = malloc(sizeof(struct icmphdr) + payload_size);
+	uint8_t *icmp_request = malloc(ICMP_PACKET_SIZE(payload_size));
 	if (icmp_request == NULL) {
 		print_error("malloc", ft_strerror(errno));
 		return NULL;
@@ -41,7 +41,7 @@ uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size
 		payload[i] = (uint8_t)i;
 	}
 
-	icmphdr->checksum = get_checksum(icmphdr, sizeof(struct icmphdr) + payload_size);
+	icmphdr->checksum = get_checksum(icmphdr, ICMP_PACKET_SIZE(payload_size));
 	return icmp_request;
 }
 
@@ -61,14 +61,14 @@ int update_icmp_request(void)
 	}
 
 	icmphdr->checksum = 0;
-	icmphdr->checksum = get_checksum(icmphdr, sizeof(struct icmphdr) + g_vars.icmp_request_payload_size);
+	icmphdr->checksum = get_checksum(icmphdr, ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size));
 	return 0;
 }
 
 int send_icmp_request(void)
 {
 	if (sendto(g_vars.socket_fd, g_vars.icmp_request,
-			sizeof(struct icmphdr) + g_vars.icmp_request_payload_size, 0,
+			ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size), 0,
 			(const struct sockaddr *)&g_vars.destination_sockaddr_in,
 			sizeof(struct sockaddr_in)) == -1) {
 		print_error("sendto", ft_strerror(errno));
