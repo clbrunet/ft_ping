@@ -69,11 +69,10 @@ int send_icmp_request(void)
 {
 	if (sendto(g_vars.socket_fd, g_vars.icmp_request,
 			ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size), 0,
-			(const struct sockaddr *)&g_vars.destination_sockaddr_in,
+			(const struct sockaddr *)&g_vars.destination.sockaddr_in,
 			sizeof(struct sockaddr_in)) == -1) {
 		print_error("sendto", ft_strerror(errno));
 		return -1;
 	}
-	printf("ICMP ECHO REQUEST sent\n");
 	return 0;
 }

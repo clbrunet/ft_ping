@@ -29,15 +29,16 @@ static int initialize_socket(int *socket_fd)
 	return 0;
 }
 
-static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *destination_arg)
+static int initialize_destination(destination_t *destination, const char *destination_arg)
 {
-	assert(sockaddr_in != NULL);
+	assert(destination != NULL);
 	assert(destination_arg != NULL);
 
 	struct addrinfo hints = {
 		.ai_family = AF_INET,
 		.ai_socktype = SOCK_RAW,
 		.ai_protocol = IPPROTO_ICMP,
+		.ai_flags = AI_CANONNAME,
 	};
 	struct addrinfo *res;
 	int error_code = getaddrinfo(destination_arg, NULL, &hints, &res);
@@ -45,7 +46,11 @@ static int initialize_sockaddr_in(struct sockaddr_in *sockaddr_in, const char *d
 		print_error(destination_arg, ft_gai_strerror(error_code));
 		return -1;
     }
-	*sockaddr_in = *(struct sockaddr_in *)res->ai_addr;
+	destination->sockaddr_in = *(struct sockaddr_in *)res->ai_addr;
+	strncpy(destination->name, res->ai_canonname, NI_MAXHOST - 1);
+	destination->name[NI_MAXHOST - 1] = '\0';
+	inet_ntop(AF_INET, (const void *)&destination->sockaddr_in.sin_addr,
+			destination->ip, INET_ADDRSTRLEN);
 	freeaddrinfo(res);
 	return 0;
 }
@@ -57,7 +62,7 @@ int initialize(const char *destination_arg)
 	if (initialize_socket(&g_vars.socket_fd) == -1) {
 		return -1;
 	}
-	if (initialize_sockaddr_in(&g_vars.destination_sockaddr_in, destination_arg) == -1) {
+	if (initialize_destination(&g_vars.destination, destination_arg) == -1) {
 		close(g_vars.socket_fd);
 		return -1;
 	}

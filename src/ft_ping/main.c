@@ -97,6 +97,9 @@ int main(int argc, char *argv[])
 
 	signal(SIGINT, &interrupt_handler);
 	signal(SIGALRM, &alarm_handler);
+	printf("PING %s (%s) %zu(%zu) bytes of data.\n", g_vars.destination.name,
+			g_vars.destination.ip, g_vars.icmp_request_payload_size,
+			IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size)));
 
 	alarm_handler(SIGALRM);
 

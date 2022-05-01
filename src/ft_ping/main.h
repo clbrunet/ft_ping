@@ -4,12 +4,20 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <netinet/in.h>
+#include <netdb.h>
 
-typedef struct variables_s
+typedef struct
+{
+	struct sockaddr_in sockaddr_in;
+	char name[NI_MAXHOST];
+	char ip[INET_ADDRSTRLEN];
+} destination_t;
+
+typedef struct
 {
 	const char *program_name;
 	int socket_fd;
-	struct sockaddr_in destination_sockaddr_in;
+	destination_t destination;
 	size_t icmp_request_payload_size;
 	size_t icmp_request_id;
 	uint8_t *icmp_request;
