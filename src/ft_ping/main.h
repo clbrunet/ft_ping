@@ -19,7 +19,7 @@ typedef struct
 	int socket_fd;
 	destination_t destination;
 	size_t icmp_request_payload_size;
-	size_t icmp_request_id;
+	uint16_t icmp_request_id;
 	uint8_t *icmp_request;
 	size_t icmp_reply_buf_size;
 	uint8_t *icmp_reply_buf;
