@@ -9,6 +9,7 @@
 
 #include "ft_ping/icmp.h"
 #include "ft_ping/main.h"
+#include "ft_ping/utils/inet.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/utils/error.h"
 #include "ft_ping/checksum.h"
@@ -24,8 +25,8 @@ uint8_t *create_icmp_request(uint16_t id, uint16_t sequence, size_t payload_size
 	icmphdr->type = ICMP_ECHO;
 	icmphdr->code = 0;
 	icmphdr->checksum = 0;
-	icmphdr->un.echo.id = id;
-	icmphdr->un.echo.sequence = sequence;
+	icmphdr->un.echo.id = ft_htons(id);
+	icmphdr->un.echo.sequence = ft_htons(sequence);
 
 	uint8_t *payload = (uint8_t *)(icmphdr + 1);
 	int payload_pad_bytes_begin_index = 0;
@@ -50,7 +51,7 @@ int update_icmp_request(void)
 	struct icmphdr *icmphdr = (struct icmphdr *)g_vars.icmp_request;
 	assert(icmphdr->type == ICMP_ECHO);
 	assert(icmphdr->code == 0);
-	icmphdr->un.echo.sequence++;
+	icmphdr->un.echo.sequence = ft_htons(ft_ntohs(icmphdr->un.echo.sequence) + 1);
 
 	uint8_t *payload = (uint8_t *)(icmphdr + 1);
 	if (g_vars.icmp_request_payload_size >= sizeof(struct timeval)) {

@@ -5,6 +5,7 @@
 #include "ft_ping/main.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/utils/error.h"
+#include "ft_ping/utils/inet.h"
 #include "ft_ping/icmp.h"
 #include "ft_ping/ip.h"
 
@@ -42,8 +43,8 @@ int recv_loop(void)
 		printf("type %hhu\n", response_icmphdr->type);
 		printf("code %hhu\n", response_icmphdr->code);
 		printf("checksum %hu\n", response_icmphdr->checksum);
-		printf("id %hu or %hu\n", response_icmphdr->un.echo.id, ntohs(response_icmphdr->un.echo.id));
-		printf("seq %hu or %hu\n", response_icmphdr->un.echo.sequence, ntohs(response_icmphdr->un.echo.sequence));
+		printf("id %hu\n", ft_ntohs(response_icmphdr->un.echo.id));
+		printf("seq %hu\n", ft_ntohs(response_icmphdr->un.echo.sequence));
 		struct timeval *tm = (struct timeval *)(response_icmphdr + 1);
 		long sec = tm->tv_sec % 60;
 		long min = tm->tv_sec / 60 % 60;
