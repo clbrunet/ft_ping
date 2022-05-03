@@ -1,4 +1,7 @@
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -76,4 +79,22 @@ int send_icmp_request(void)
 		return -1;
 	}
 	return 0;
+}
+
+bool is_icmphdr_valid(struct icmphdr *icmphdr, size_t payload_size,
+		uint8_t expected_type, uint16_t expected_id)
+{
+	if (icmphdr->type != expected_type) {
+		return false;
+	}
+	if (icmphdr->code != 0) {
+		return false;
+	}
+	if (is_checksum_valid(icmphdr, ICMP_PACKET_SIZE(payload_size), &icmphdr->checksum) != true) {
+		return false;
+	}
+	if (ft_ntohs(icmphdr->un.echo.id) != expected_id) {
+		return false;
+	}
+	return true;
 }

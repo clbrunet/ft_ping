@@ -47,8 +47,6 @@ bool is_checksum_valid(void *addr, size_t size, uint16_t *checksum_ptr)
 	bool is_checksum_valid = true;
 	uint16_t checksum_backup = *checksum_ptr;
 	*checksum_ptr = 0;
-	printf("ICI %d\n", checksum_backup);
-	printf("ICI %d\n", get_checksum(addr, size));
 	if (get_data_sum(addr, size) + checksum_backup != UINT16_MAX) {
 		is_checksum_valid = false;
 	}

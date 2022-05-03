@@ -1,4 +1,6 @@
 #include <errno.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #include <stdio.h>
 
 #include "ft_ping/recv_loop.h"
@@ -30,6 +32,11 @@ int recv_loop(void)
 		}
 		if (is_iphdr_valid((struct iphdr *)g_vars.icmp_reply_buf,
 				IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size))) == false) {
+			continue;
+		}
+		if (is_icmphdr_valid((struct icmphdr *)(g_vars.icmp_reply_buf + sizeof(struct iphdr)),
+				g_vars.icmp_request_payload_size,
+				ICMP_ECHOREPLY, g_vars.icmp_request_id) == false) {
 			continue;
 		}
 		printf("\nMessage received\n");
