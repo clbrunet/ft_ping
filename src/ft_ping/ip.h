@@ -6,5 +6,6 @@
 #include <netinet/ip.h>
 
 bool is_iphdr_valid(struct iphdr *iphdr, uint16_t expected_total_length);
+bool has_ip_format(const char *str);
 
 #endif

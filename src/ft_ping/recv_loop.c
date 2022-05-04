@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
+#include <sys/time.h>
 #include <stdio.h>
 
 #include "ft_ping/recv_loop.h"
@@ -27,35 +28,53 @@ int recv_loop(void)
 			print_error("recvmsg", ft_strerror(errno));
 			return -1;
 		}
+		struct timeval current_tv;
+		if (g_vars.icmp_request_payload_size >= sizeof(struct timeval)) {
+			if (gettimeofday(&current_tv, NULL) == -1) {
+				print_error("gettimeofday", ft_strerror(errno));
+				return -1;
+			}
+		}
 		if ((size_t)ret != IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size))) {
 			continue;
 		}
-		if (is_iphdr_valid((struct iphdr *)g_vars.icmp_reply_buf,
+		struct iphdr *response_iphdr = (struct iphdr *)g_vars.icmp_reply_buf;
+		if (is_iphdr_valid(response_iphdr,
 				IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size))) == false) {
 			continue;
 		}
-		if (is_icmphdr_valid((struct icmphdr *)(g_vars.icmp_reply_buf + sizeof(struct iphdr)),
-				g_vars.icmp_request_payload_size,
+		struct icmphdr *response_icmphdr = (struct icmphdr *)(response_iphdr + 1);
+		if (is_icmphdr_valid(response_icmphdr, g_vars.icmp_request_payload_size,
 				ICMP_ECHOREPLY, g_vars.icmp_request_id) == false) {
 			continue;
 		}
-		printf("\nMessage received\n");
-		print_memory(g_vars.icmp_reply_buf, ret);
-		struct iphdr *response_iphdr = (void *)g_vars.icmp_reply_buf;
-		printf("IP header\n");
-		printf("saddr %u\n", response_iphdr->saddr);
-		printf("daddr %u\n", response_iphdr->daddr);
-		struct icmphdr *response_icmphdr = (void *)g_vars.icmp_reply_buf + 20;
-		printf("ICMP header\n");
-		printf("type %hhu\n", response_icmphdr->type);
-		printf("code %hhu\n", response_icmphdr->code);
-		printf("checksum %hu\n", response_icmphdr->checksum);
-		printf("id %hu\n", ft_ntohs(response_icmphdr->un.echo.id));
-		printf("seq %hu\n", ft_ntohs(response_icmphdr->un.echo.sequence));
-		struct timeval *tm = (struct timeval *)(response_icmphdr + 1);
-		long sec = tm->tv_sec % 60;
-		long min = tm->tv_sec / 60 % 60;
-		long hour = tm->tv_sec / 60 / 60 % 24;
-		printf("UTC time : %02ld:%02ld.%02ld\n", hour, min, sec);
+		printf("%lu bytes from ", ret - sizeof(struct iphdr));
+		if (has_ip_format(g_vars.destination.name)) {
+			printf("%s: ", g_vars.destination.ip);
+		} else {
+			printf("%s (%s): ", g_vars.destination.name, g_vars.destination.ip);
+		}
+		printf("icmp_seq=%hu ttl=%hhu", ft_ntohs(response_icmphdr->un.echo.sequence),
+				response_iphdr->ttl);
+		if (g_vars.icmp_request_payload_size >= sizeof(struct timeval)) {
+			struct timeval *sending_tv = (struct timeval *)(response_icmphdr + 1);
+			struct timeval diff_tv = {
+				.tv_sec = current_tv.tv_sec - sending_tv->tv_sec,
+				.tv_usec = current_tv.tv_usec - sending_tv->tv_usec,
+			};
+			double ms = diff_tv.tv_sec * 1000 + (double)diff_tv.tv_usec / 1000;
+			int ms_precision;
+			if (ms < 1) {
+				ms_precision = 3;
+			} else if (ms < 10) {
+				ms_precision = 2;
+			} else if (ms < 100) {
+				ms_precision = 1;
+			} else {
+				ms_precision = 0;
+			}
+			printf(" time=%.*f", ms_precision, ms);
+		}
+		printf("\n");
 	}
 }

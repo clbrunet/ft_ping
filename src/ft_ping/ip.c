@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #include "ft_ping/ip.h"
+#include "ft_ping/utils/ctype.h"
 #include "ft_ping/utils/inet.h"
 #include "ft_ping/checksum.h"
 
@@ -34,4 +35,33 @@ bool is_iphdr_valid(struct iphdr *iphdr, uint16_t expected_total_length)
 		return false;
 	}
 	return true;
+}
+
+bool has_ip_format(const char *str)
+{
+	if (ft_isdigit(*str) == 0) {
+		return false;
+	}
+	while (ft_isdigit(*str) != 0) {
+		str++;
+	}
+	for (size_t i = 0; i < 3; i++) {
+		if (*str == '\0') {
+			return true;
+		}
+		if (*str != '.') {
+			return false;
+		}
+		str++;
+		if (ft_isdigit(*str) == 0) {
+			return false;
+		}
+		while (ft_isdigit(*str) != 0) {
+			str++;
+		}
+	}
+	if (*str == '\0') {
+		return true;
+	}
+	return false;
 }
