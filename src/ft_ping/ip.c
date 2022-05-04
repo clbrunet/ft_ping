@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <netinet/ip.h>
+#include <stdio.h>
 #include <stddef.h>
 
 #include "ft_ping/ip.h"
@@ -19,7 +21,10 @@ bool is_iphdr_valid(struct iphdr *iphdr, uint16_t expected_total_length)
 	if (ft_ntohs(iphdr->tot_len) != expected_total_length) {
 		return false;
 	}
-	if (ft_ntohs(iphdr->frag_off) != 0) {
+	if ((ft_ntohs(iphdr->frag_off) & IP_MF) != 0) {
+		return false;
+	}
+	if ((ft_ntohs(iphdr->frag_off) & IP_OFFMASK) != 0) {
 		return false;
 	}
 	if (iphdr->protocol != IPPROTO_ICMP) {
