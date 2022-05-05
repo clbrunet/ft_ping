@@ -82,5 +82,8 @@ int initialize(const char *destination_arg)
 		close(g_vars.socket_fd);
 		return -1;
 	}
+	g_vars.transmitted_packets_count = 0;
+	g_vars.received_packets_count = 0;
+	g_vars.ms_from_first_sending_time = 0;
 	return 0;
 }

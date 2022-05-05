@@ -1,6 +1,7 @@
 #ifndef FT_PING_MAIN_H
 #define FT_PING_MAIN_H
 
+#include <bits/types/struct_timeval.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <netinet/in.h>
@@ -23,6 +24,10 @@ typedef struct
 	uint8_t *icmp_request;
 	size_t icmp_reply_buf_size;
 	uint8_t *icmp_reply_buf;
+	size_t transmitted_packets_count;
+	size_t received_packets_count;
+	struct timeval first_sending_time;
+	size_t ms_from_first_sending_time;
 } variables_t;
 
 extern variables_t g_vars;

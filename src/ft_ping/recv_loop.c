@@ -48,6 +48,7 @@ int recv_loop(void)
 				ICMP_ECHOREPLY, g_vars.icmp_request_id) == false) {
 			continue;
 		}
+		g_vars.received_packets_count++;
 		printf("%lu bytes from ", ret - sizeof(struct iphdr));
 		if (has_ip_format(g_vars.destination.name)) {
 			printf("%s: ", g_vars.destination.ip);

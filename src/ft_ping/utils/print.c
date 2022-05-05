@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include "ft_ping/main.h"
 #include "ft_ping/utils/print.h"
@@ -44,4 +45,35 @@ void print_memory(const uint8_t *address, size_t size)
 		i++;
 	}
 	printf("\n%07zx\n", i);
+}
+
+void print_char(char c)
+{
+	write(1, &c, 1);
+}
+
+void print_string(const char *str)
+{
+	assert(str != NULL);
+
+	write(1, str, ft_strlen(str));
+}
+
+void print_number(long long nbr)
+{
+	unsigned long long u_nbr;
+	if (nbr == LLONG_MIN) {
+		write(1, "-", 1);
+		u_nbr = (unsigned long long)LLONG_MAX + 1;
+	} else if (nbr < 0) {
+		write(1, "-", 1);
+		u_nbr = -nbr;
+	} else {
+		u_nbr = nbr;
+	}
+
+	if (u_nbr >= 10) {
+		print_number(u_nbr / 10);
+	}
+	print_char(u_nbr % 10 + '0');
 }
