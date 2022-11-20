@@ -64,6 +64,14 @@ int recv_loop(void)
 				.tv_usec = current_tv.tv_usec - sending_tv->tv_usec,
 			};
 			double ms = diff_tv.tv_sec * 1000 + (double)diff_tv.tv_usec / 1000;
+			if (ms < g_vars.min_rtt) {
+				g_vars.min_rtt = ms;
+			}
+			g_vars.rtt_sum += ms;
+			if (g_vars.max_rtt < ms) {
+				g_vars.max_rtt = ms;
+			}
+			g_vars.squared_rtt_sum += ms * ms;
 			int ms_precision;
 			if (ms < 1) {
 				ms_precision = 3;

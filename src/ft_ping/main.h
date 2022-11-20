@@ -28,6 +28,10 @@ typedef struct
 	size_t received_packets_count;
 	struct timeval first_sending_time;
 	size_t ms_from_first_sending_time;
+	double min_rtt;
+	double rtt_sum;
+	double max_rtt;
+	double squared_rtt_sum;
 } variables_t;
 
 extern variables_t g_vars;

@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <float.h>
 
 #include "ft_ping/initialize.h"
 #include "ft_ping/main.h"
@@ -85,5 +86,9 @@ int initialize(const char *destination_arg)
 	g_vars.transmitted_packets_count = 0;
 	g_vars.received_packets_count = 0;
 	g_vars.ms_from_first_sending_time = 0;
+	g_vars.min_rtt = DBL_MAX;
+	g_vars.rtt_sum = 0.0;
+	g_vars.max_rtt = 0.0;
+	g_vars.squared_rtt_sum = 0.0;
 	return 0;
 }

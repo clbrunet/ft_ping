@@ -77,3 +77,14 @@ void print_number(long long nbr)
 	}
 	print_char(u_nbr % 10 + '0');
 }
+
+void print_double(double nbr, size_t precision)
+{
+	print_number((long long)nbr);
+	print_char('.');
+	for (size_t i = 0; i < precision; i++) {
+		nbr -= (long long)nbr;
+		nbr *= 10;
+		print_number((long long)nbr);
+	}
+}

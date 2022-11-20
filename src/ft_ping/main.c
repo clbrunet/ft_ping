@@ -15,6 +15,7 @@
 #include "ft_ping/terminate.h"
 #include "ft_ping/recv_loop.h"
 #include "ft_ping/utils/string.h"
+#include "ft_ping/utils/math.h"
 
 variables_t g_vars = {0};
 
@@ -45,8 +46,16 @@ static void interrupt_handler(int signum)
 		exit_status = 1;
 	} else {
 		print_string("rtt min/agv/max/mdev = ");
-		// TODO: print correct values
-		print_string("VALUES");
+		print_double(g_vars.min_rtt, 3);
+		print_char('/');
+		double avg = g_vars.rtt_sum / g_vars.received_packets_count;
+		print_double(avg, 3);
+		print_char('/');
+		print_double(g_vars.max_rtt, 3);
+		print_char('/');
+		// Standard deviation formula : https://www.brainkart.com/article/Calculation-of-Standard-Deviation_39437/
+		double mdev = ft_sqrt(g_vars.squared_rtt_sum / g_vars.received_packets_count - (avg * avg));
+		print_double(mdev, 3);
 		print_string(" ms\n");
 	}
 	terminate();
@@ -73,12 +82,12 @@ static void alarm_handler(int signum)
 	if (ft_ntohs(((struct icmphdr *)g_vars.icmp_request)->un.echo.sequence) == 1) {
 		g_vars.first_sending_time = current_tv;
 	} else {
-		struct timeval diff_from_first_recetion_tv = {
+		struct timeval diff_from_first_reception_tv = {
 			.tv_sec = current_tv.tv_sec - g_vars.first_sending_time.tv_sec,
 			.tv_usec = current_tv.tv_usec - g_vars.first_sending_time.tv_usec,
 		};
-		g_vars.ms_from_first_sending_time = diff_from_first_recetion_tv.tv_sec * 1000
-			+ (double)diff_from_first_recetion_tv.tv_usec / 1000;
+		g_vars.ms_from_first_sending_time = diff_from_first_reception_tv.tv_sec * 1000
+			+ (double)diff_from_first_reception_tv.tv_usec / 1000;
 	}
 	g_vars.transmitted_packets_count++;
 }

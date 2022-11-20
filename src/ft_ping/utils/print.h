@@ -9,5 +9,6 @@ void print_memory(const uint8_t *address, size_t size);
 void print_char(char c);
 void print_string(const char *str);
 void print_number(long long nbr);
+void print_double(double nbr, size_t precision);
 
 #endif
