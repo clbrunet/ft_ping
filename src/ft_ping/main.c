@@ -45,7 +45,7 @@ static void interrupt_handler(int signum)
 		print_char('\n');
 		exit_status = 1;
 	} else {
-		print_string("rtt min/agv/max/mdev = ");
+		print_string("rtt min/avg/max/mdev = ");
 		print_double(g_vars.min_rtt, 3);
 		print_char('/');
 		double avg = g_vars.rtt_sum / g_vars.received_packets_count;

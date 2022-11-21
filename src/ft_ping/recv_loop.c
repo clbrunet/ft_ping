@@ -82,7 +82,7 @@ int recv_loop(void)
 			} else {
 				ms_precision = 0;
 			}
-			printf(" time=%.*f", ms_precision, ms);
+			printf(" time=%.*f ms", ms_precision, ms);
 		}
 		printf("\n");
 	}
