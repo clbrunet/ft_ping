@@ -17,6 +17,7 @@
 #include "ft_ping/utils/error.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/icmp.h"
+#include "ft_ping/utils/string.h"
 
 static int initialize_socket(int *socket_fd)
 {
@@ -48,8 +49,7 @@ static int initialize_destination(destination_t *destination, const char *destin
 		return -1;
     }
 	destination->sockaddr_in = *(struct sockaddr_in *)res->ai_addr;
-	strncpy(destination->name, res->ai_canonname, NI_MAXHOST - 1);
-	destination->name[NI_MAXHOST - 1] = '\0';
+	ft_strlcpy(destination->name, res->ai_canonname, NI_MAXHOST);
 	inet_ntop(AF_INET, (const void *)&destination->sockaddr_in.sin_addr,
 			destination->ip, INET_ADDRSTRLEN);
 	freeaddrinfo(res);
