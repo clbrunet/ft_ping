@@ -94,13 +94,8 @@ static void alarm_handler(int signum)
 
 int main(int argc, char *argv[])
 {
-	g_vars.program_name = argv[0];
-	if (argc < 2) {
-		print_error("usage error", ft_strerror(EDESTADDRREQ));
-		return 1;
-	}
-
-	if (initialize(argv[1]) == -1) {
+	(void)argc;
+	if (initialize((const char *const *)argv) == -1) {
 		return 2;
 	}
 
