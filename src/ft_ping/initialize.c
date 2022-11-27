@@ -24,7 +24,7 @@ static int initialize_socket(int *socket_fd)
 {
 	assert(socket_fd != NULL);
 
-	*socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+	*socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
 	if (*socket_fd == -1) {
 		print_error("socket", ft_strerror(errno));
 		return -1;
@@ -39,8 +39,8 @@ static int initialize_destination(destination_t *destination, const char *destin
 
 	struct addrinfo hints = {
 		.ai_family = AF_INET,
-		.ai_socktype = SOCK_RAW,
-		.ai_protocol = IPPROTO_ICMP,
+		.ai_socktype = SOCK_DGRAM,
+		.ai_protocol = IPPROTO_UDP,
 		.ai_flags = AI_CANONNAME,
 	};
 	struct addrinfo *res;

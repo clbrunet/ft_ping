@@ -24,6 +24,9 @@ int recv_loop(void)
 	};
 	while (true) {
 		ssize_t ret = recvmsg(g_vars.socket_fd, &msg, 0);
+		printf("TODO remove ret %zd\n", ret);
+		printf("TODO remove expected %zd\n", IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size)));
+		// TODO: No ip header while using SOCK_DGRAM
 		if (ret == -1) {
 			print_error("recvmsg", ft_strerror(errno));
 			return -1;
