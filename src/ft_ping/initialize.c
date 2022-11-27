@@ -91,7 +91,7 @@ static int parse_args(const char *const args[])
 						usage();
 						break;
 					case 'v':
-						g_vars.is_verbose = true;
+						g_ping.is_verbose = true;
 						break;
 					default:
 						invalid_option(*arg);
@@ -103,7 +103,7 @@ static int parse_args(const char *const args[])
 				print_error("usage error", "Too many destination addresses");
 				return -1;
 			}
-			if (initialize_destination(&g_vars.destination, arg) == -1) {
+			if (initialize_destination(&g_ping.destination, arg) == -1) {
 				return -1;
 			}
 			is_destination_initialized = true;
@@ -121,38 +121,38 @@ int initialize(const char *const argv[])
 {
 	assert(argv != NULL);
 
-	g_vars.program_name = argv[0];
-	g_vars.icmp_request_payload_size = 56;
-	g_vars.is_verbose = false;
+	g_ping.program_name = argv[0];
+	g_ping.icmp_request_payload_size = 56;
+	g_ping.is_verbose = false;
 	if (parse_args(argv + 1) == -1) {
 		return -1;
 	}
 
-	if (initialize_socket(&g_vars.socket_fd) == -1) {
+	if (initialize_socket(&g_ping.socket_fd) == -1) {
 		return -1;
 	}
-	g_vars.icmp_request_id = getpid() & UINT16_MAX;
-	g_vars.icmp_request = create_icmp_request(g_vars.icmp_request_id, 0,
-			g_vars.icmp_request_payload_size);
-	if (g_vars.icmp_request == NULL) {
-		close(g_vars.socket_fd);
+	g_ping.icmp_request_id = getpid() & UINT16_MAX;
+	g_ping.icmp_request = create_icmp_request(g_ping.icmp_request_id, 0,
+			g_ping.icmp_request_payload_size);
+	if (g_ping.icmp_request == NULL) {
+		close(g_ping.socket_fd);
 		return -1;
 	}
-	g_vars.icmp_reply_buf_size
-		= IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size)) + 1;
-	g_vars.icmp_reply_buf = malloc(g_vars.icmp_reply_buf_size);
-	if (g_vars.icmp_reply_buf == NULL) {
-		free(g_vars.icmp_request);
-		close(g_vars.socket_fd);
+	g_ping.icmp_reply_buf_size
+		= IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size)) + 1;
+	g_ping.icmp_reply_buf = malloc(g_ping.icmp_reply_buf_size);
+	if (g_ping.icmp_reply_buf == NULL) {
+		free(g_ping.icmp_request);
+		close(g_ping.socket_fd);
 		return -1;
 	}
 
-	g_vars.transmitted_packets_count = 0;
-	g_vars.received_packets_count = 0;
-	g_vars.ms_from_first_sending_time = 0;
-	g_vars.min_rtt = DBL_MAX;
-	g_vars.rtt_sum = 0.0;
-	g_vars.max_rtt = 0.0;
-	g_vars.squared_rtt_sum = 0.0;
+	g_ping.transmitted_packets_count = 0;
+	g_ping.received_packets_count = 0;
+	g_ping.ms_from_first_sending_time = 0;
+	g_ping.min_rtt = DBL_MAX;
+	g_ping.rtt_sum = 0.0;
+	g_ping.max_rtt = 0.0;
+	g_ping.squared_rtt_sum = 0.0;
 	return 0;
 }

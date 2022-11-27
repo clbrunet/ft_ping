@@ -17,7 +17,7 @@
 #include "ft_ping/utils/string.h"
 #include "ft_ping/utils/math.h"
 
-variables_t g_vars = {0};
+ping_t g_ping = {0};
 
 static void interrupt_handler(int signum)
 {
@@ -25,36 +25,36 @@ static void interrupt_handler(int signum)
 	int exit_status = 0;
 
 	print_string("\n--- ");
-	print_string(g_vars.destination.name);
+	print_string(g_ping.destination.name);
 	print_string(" ping statistics ---\n");
 
-	print_number(g_vars.transmitted_packets_count);
+	print_number(g_ping.transmitted_packets_count);
 	print_string(" packets transmitted, ");
-	print_number(g_vars.received_packets_count);
+	print_number(g_ping.received_packets_count);
 	print_string(" received, ");
 	double packet_loss_percent = 100;
-	if (g_vars.transmitted_packets_count != 0) {
-		packet_loss_percent = 100 - 100 * ((double)g_vars.received_packets_count
-				/ (double)g_vars.transmitted_packets_count);
+	if (g_ping.transmitted_packets_count != 0) {
+		packet_loss_percent = 100 - 100 * ((double)g_ping.received_packets_count
+				/ (double)g_ping.transmitted_packets_count);
 	}
 	print_number(packet_loss_percent);
 	print_string("% packet loss, time ");
-	print_number(g_vars.ms_from_first_sending_time);
+	print_number(g_ping.ms_from_first_sending_time);
 	print_string("ms\n");
-	if (g_vars.received_packets_count == 0) {
+	if (g_ping.received_packets_count == 0) {
 		print_char('\n');
 		exit_status = 1;
 	} else {
 		print_string("rtt min/avg/max/mdev = ");
-		print_double(g_vars.min_rtt, 3);
+		print_double(g_ping.min_rtt, 3);
 		print_char('/');
-		double avg = g_vars.rtt_sum / g_vars.received_packets_count;
+		double avg = g_ping.rtt_sum / g_ping.received_packets_count;
 		print_double(avg, 3);
 		print_char('/');
-		print_double(g_vars.max_rtt, 3);
+		print_double(g_ping.max_rtt, 3);
 		print_char('/');
 		// Standard deviation formula : https://www.brainkart.com/article/Calculation-of-Standard-Deviation_39437/
-		double mdev = ft_sqrt(g_vars.squared_rtt_sum / g_vars.received_packets_count - (avg * avg));
+		double mdev = ft_sqrt(g_ping.squared_rtt_sum / g_ping.received_packets_count - (avg * avg));
 		print_double(mdev, 3);
 		print_string(" ms\n");
 	}
@@ -79,17 +79,17 @@ static void alarm_handler(int signum)
 		terminate();
 		exit(2);
 	}
-	if (ft_ntohs(((struct icmphdr *)g_vars.icmp_request)->un.echo.sequence) == 1) {
-		g_vars.first_sending_time = current_tv;
+	if (ft_ntohs(((struct icmphdr *)g_ping.icmp_request)->un.echo.sequence) == 1) {
+		g_ping.first_sending_time = current_tv;
 	} else {
 		struct timeval diff_from_first_reception_tv = {
-			.tv_sec = current_tv.tv_sec - g_vars.first_sending_time.tv_sec,
-			.tv_usec = current_tv.tv_usec - g_vars.first_sending_time.tv_usec,
+			.tv_sec = current_tv.tv_sec - g_ping.first_sending_time.tv_sec,
+			.tv_usec = current_tv.tv_usec - g_ping.first_sending_time.tv_usec,
 		};
-		g_vars.ms_from_first_sending_time = diff_from_first_reception_tv.tv_sec * 1000
+		g_ping.ms_from_first_sending_time = diff_from_first_reception_tv.tv_sec * 1000
 			+ (double)diff_from_first_reception_tv.tv_usec / 1000;
 	}
-	g_vars.transmitted_packets_count++;
+	g_ping.transmitted_packets_count++;
 }
 
 int main(int argc, char *argv[])
@@ -102,9 +102,9 @@ int main(int argc, char *argv[])
 	signal(SIGINT, &interrupt_handler);
 	signal(SIGALRM, &alarm_handler);
 
-	printf("PING %s (%s) %zu(%zu) bytes of data.\n", g_vars.destination.name,
-			g_vars.destination.ip, g_vars.icmp_request_payload_size,
-			IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size)));
+	printf("PING %s (%s) %zu(%zu) bytes of data.\n", g_ping.destination.name,
+			g_ping.destination.ip, g_ping.icmp_request_payload_size,
+			IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size)));
 
 	alarm_handler(SIGALRM);
 

@@ -10,11 +10,11 @@
 
 void print_error(const char *error_title, const char *error_description)
 {
-	assert(g_vars.program_name != NULL);
+	assert(g_ping.program_name != NULL);
 	assert(error_title != NULL);
 	assert(error_description != NULL);
 
-	write(STDERR_FILENO, g_vars.program_name, ft_strlen(g_vars.program_name));
+	write(STDERR_FILENO, g_ping.program_name, ft_strlen(g_ping.program_name));
 	write(STDERR_FILENO, ": ", 2);
 	write(STDERR_FILENO, error_title, ft_strlen(error_title));
 	write(STDERR_FILENO, ": ", 2);

@@ -15,63 +15,63 @@
 int recv_loop(void)
 {
 	struct iovec msg_iov[1] = {
-		[0].iov_base = g_vars.icmp_reply_buf,
-		[0].iov_len = g_vars.icmp_reply_buf_size,
+		[0].iov_base = g_ping.icmp_reply_buf,
+		[0].iov_len = g_ping.icmp_reply_buf_size,
 	};
 	struct msghdr msg = {
 		.msg_iov = msg_iov,
 		.msg_iovlen = 1,
 	};
 	while (true) {
-		ssize_t ret = recvmsg(g_vars.socket_fd, &msg, 0);
+		ssize_t ret = recvmsg(g_ping.socket_fd, &msg, 0);
 		if (ret == -1) {
 			print_error("recvmsg", ft_strerror(errno));
 			return -1;
 		}
 		struct timeval current_tv;
-		if (g_vars.icmp_request_payload_size >= sizeof(struct timeval)) {
+		if (g_ping.icmp_request_payload_size >= sizeof(struct timeval)) {
 			if (gettimeofday(&current_tv, NULL) == -1) {
 				print_error("gettimeofday", ft_strerror(errno));
 				return -1;
 			}
 		}
-		if ((size_t)ret != IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size))) {
+		if ((size_t)ret != IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size))) {
 			continue;
 		}
-		struct iphdr *response_iphdr = (struct iphdr *)g_vars.icmp_reply_buf;
+		struct iphdr *response_iphdr = (struct iphdr *)g_ping.icmp_reply_buf;
 		if (is_iphdr_valid(response_iphdr,
-				IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_vars.icmp_request_payload_size))) == false) {
+				IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size))) == false) {
 			continue;
 		}
 		struct icmphdr *response_icmphdr = (struct icmphdr *)(response_iphdr + 1);
-		if (is_icmphdr_valid(response_icmphdr, g_vars.icmp_request_payload_size,
-				ICMP_ECHOREPLY, g_vars.icmp_request_id) == false) {
+		if (is_icmphdr_valid(response_icmphdr, g_ping.icmp_request_payload_size,
+				ICMP_ECHOREPLY, g_ping.icmp_request_id) == false) {
 			continue;
 		}
-		g_vars.received_packets_count++;
+		g_ping.received_packets_count++;
 		printf("%lu bytes from ", ret - sizeof(struct iphdr));
-		if (has_ip_format(g_vars.destination.name)) {
-			printf("%s: ", g_vars.destination.ip);
+		if (has_ip_format(g_ping.destination.name)) {
+			printf("%s: ", g_ping.destination.ip);
 		} else {
-			printf("%s (%s): ", g_vars.destination.name, g_vars.destination.ip);
+			printf("%s (%s): ", g_ping.destination.name, g_ping.destination.ip);
 		}
 		printf("icmp_seq=%hu ttl=%hhu", ft_ntohs(response_icmphdr->un.echo.sequence),
 				response_iphdr->ttl);
-		if (g_vars.icmp_request_payload_size >= sizeof(struct timeval)) {
+		if (g_ping.icmp_request_payload_size >= sizeof(struct timeval)) {
 			struct timeval *sending_tv = (struct timeval *)(response_icmphdr + 1);
 			struct timeval diff_tv = {
 				.tv_sec = current_tv.tv_sec - sending_tv->tv_sec,
 				.tv_usec = current_tv.tv_usec - sending_tv->tv_usec,
 			};
 			double ms = diff_tv.tv_sec * 1000 + (double)diff_tv.tv_usec / 1000;
-			if (ms < g_vars.min_rtt) {
-				g_vars.min_rtt = ms;
+			if (ms < g_ping.min_rtt) {
+				g_ping.min_rtt = ms;
 			}
-			g_vars.rtt_sum += ms;
-			if (g_vars.max_rtt < ms) {
-				g_vars.max_rtt = ms;
+			g_ping.rtt_sum += ms;
+			if (g_ping.max_rtt < ms) {
+				g_ping.max_rtt = ms;
 			}
-			g_vars.squared_rtt_sum += ms * ms;
+			g_ping.squared_rtt_sum += ms * ms;
 			int ms_precision;
 			if (ms < 1) {
 				ms_precision = 3;

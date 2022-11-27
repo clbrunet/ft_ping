@@ -36,8 +36,8 @@ typedef struct
 	double rtt_sum;
 	double max_rtt;
 	double squared_rtt_sum;
-} variables_t;
+} ping_t;
 
-extern variables_t g_vars;
+extern ping_t g_ping;
 
 #endif
