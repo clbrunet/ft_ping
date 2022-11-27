@@ -36,6 +36,7 @@ typedef struct
 	double rtt_sum;
 	double max_rtt;
 	double squared_rtt_sum;
+	double ewma;
 } ping_t;
 
 extern ping_t g_ping;

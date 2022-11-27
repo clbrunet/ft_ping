@@ -72,6 +72,11 @@ int recv_loop(void)
 				g_ping.max_rtt = ms;
 			}
 			g_ping.squared_rtt_sum += ms * ms;
+			if (g_ping.ewma == 0.0) {
+				g_ping.ewma = ms * 8;
+			} else {
+				g_ping.ewma += ms - g_ping.ewma / 8;
+			}
 			int ms_precision;
 			if (ms < 1) {
 				ms_precision = 3;

@@ -154,5 +154,6 @@ int initialize(const char *const argv[])
 	g_ping.rtt_sum = 0.0;
 	g_ping.max_rtt = 0.0;
 	g_ping.squared_rtt_sum = 0.0;
+	g_ping.ewma = 0.0;
 	return 0;
 }

@@ -62,6 +62,33 @@ static void interrupt_handler(int signum)
 	exit(exit_status);
 }
 
+static void quit_handler(int signum)
+{
+	(void)signum;
+
+	print_string("\b\b");
+	print_number(g_ping.received_packets_count);
+	print_char('/');
+	print_number(g_ping.transmitted_packets_count);
+	print_string(", ");
+	double packet_loss_percent = 100;
+	if (g_ping.transmitted_packets_count != 0) {
+		packet_loss_percent = 100 - 100 * ((double)g_ping.received_packets_count
+				/ (double)g_ping.transmitted_packets_count);
+	}
+	print_number(packet_loss_percent);
+	print_string("% loss, min/avg/ewma/max = ");
+	print_double(g_ping.min_rtt, 3);
+	print_char('/');
+	double avg = g_ping.rtt_sum / g_ping.received_packets_count;
+	print_double(avg, 3);
+	print_char('/');
+	print_double(g_ping.ewma / 8, 3);
+	print_char('/');
+	print_double(g_ping.max_rtt, 3);
+	print_string(" ms\n");
+}
+
 static void alarm_handler(int signum)
 {
 	(void)signum;
@@ -100,6 +127,7 @@ int main(int argc, char *argv[])
 	}
 
 	signal(SIGINT, &interrupt_handler);
+	signal(SIGQUIT, &quit_handler);
 	signal(SIGALRM, &alarm_handler);
 
 	printf("PING %s (%s) %zu(%zu) bytes of data.\n", g_ping.destination.name,
