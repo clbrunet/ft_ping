@@ -1,3 +1,6 @@
+#include <asm-generic/errno.h>
+#include <netdb.h>
+
 #include "ft_ping/utils/error.h"
 
 const char *ft_strerror(int errnum)
@@ -5,273 +8,272 @@ const char *ft_strerror(int errnum)
 	switch (errnum) {
 		case 0:
 			return "Success";
-		case 1:
+		case EPERM:
 			return "Operation not permitted";
-		case 2:
+		case ENOENT:
 			return "No such file or directory";
-		case 3:
+		case ESRCH:
 			return "No such process";
-		case 4:
+		case EINTR:
 			return "Interrupted system call";
-		case 5:
+		case EIO:
 			return "Input/output error";
-		case 6:
+		case ENXIO:
 			return "No such device or address";
-		case 7:
+		case E2BIG:
 			return "Argument list too long";
-		case 8:
+		case ENOEXEC:
 			return "Exec format error";
-		case 9:
+		case EBADF:
 			return "Bad file descriptor";
-		case 10:
+		case ECHILD:
 			return "No child processes";
-		case 11:
+		case EAGAIN:
 			return "Resource temporarily unavailable";
-		case 12:
+		case ENOMEM:
 			return "Cannot allocate memory";
-		case 13:
+		case EACCES:
 			return "Permission denied";
-		case 14:
+		case EFAULT:
 			return "Bad address";
-		case 15:
+		case ENOTBLK:
 			return "Block device required";
-		case 16:
+		case EBUSY:
 			return "Device or resource busy";
-		case 17:
+		case EEXIST:
 			return "File exists";
-		case 18:
+		case EXDEV:
 			return "Invalid cross-device link";
-		case 19:
+		case ENODEV:
 			return "No such device";
-		case 20:
+		case ENOTDIR:
 			return "Not a directory";
-		case 21:
+		case EISDIR:
 			return "Is a directory";
-		case 22:
+		case EINVAL:
 			return "Invalid argument";
-		case 23:
+		case ENFILE:
 			return "Too many open files in system";
-		case 24:
+		case EMFILE:
 			return "Too many open files";
-		case 25:
+		case ENOTTY:
 			return "Inappropriate ioctl for device";
-		case 26:
+		case ETXTBSY:
 			return "Text file busy";
-		case 27:
+		case EFBIG:
 			return "File too large";
-		case 28:
+		case ENOSPC:
 			return "No space left on device";
-		case 29:
+		case ESPIPE:
 			return "Illegal seek";
-		case 30:
+		case EROFS:
 			return "Read-only file system";
-		case 31:
+		case EMLINK:
 			return "Too many links";
-		case 32:
+		case EPIPE:
 			return "Broken pipe";
-		case 33:
+		case EDOM:
 			return "Numerical argument out of domain";
-		case 34:
+		case ERANGE:
 			return "Numerical result out of range";
-		case 35:
+		case EDEADLK:
 			return "Resource deadlock avoided";
-		case 36:
+		case ENAMETOOLONG:
 			return "File name too long";
-		case 37:
+		case ENOLCK:
 			return "No locks available";
-		case 38:
+		case ENOSYS:
 			return "Function not implemented";
-		case 39:
+		case ENOTEMPTY:
 			return "Directory not empty";
-		case 40:
+		case ELOOP:
 			return "Too many levels of symbolic links";
-		case 42:
+		case ENOMSG:
 			return "No message of desired type";
-		case 43:
+		case EIDRM:
 			return "Identifier removed";
-		case 44:
+		case ECHRNG:
 			return "Channel number out of range";
-		case 45:
+		case EL2NSYNC:
 			return "Level 2 not synchronized";
-		case 46:
+		case EL3HLT:
 			return "Level 3 halted";
-		case 47:
+		case EL3RST:
 			return "Level 3 reset";
-		case 48:
+		case ELNRNG:
 			return "Link number out of range";
-		case 49:
+		case EUNATCH:
 			return "Protocol driver not attached";
-		case 50:
+		case ENOCSI:
 			return "No CSI structure available";
-		case 51:
+		case EL2HLT:
 			return "Level 2 halted";
-		case 52:
+		case EBADE:
 			return "Invalid exchange";
-		case 53:
+		case EBADR:
 			return "Invalid request descriptor";
-		case 54:
+		case EXFULL:
 			return "Exchange full";
-		case 55:
+		case ENOANO:
 			return "No anode";
-		case 56:
+		case EBADRQC:
 			return "Invalid request code";
-		case 57:
+		case EBADSLT:
 			return "Invalid slot";
-		case 59:
+		case EBFONT:
 			return "Bad font file format";
-		case 60:
+		case ENOSTR:
 			return "Device not a stream";
-		case 61:
+		case ENODATA:
 			return "No data available";
-		case 62:
+		case ETIME:
 			return "Timer expired";
-		case 63:
+		case ENOSR:
 			return "Out of streams resources";
-		case 64:
+		case ENONET:
 			return "Machine is not on the network";
-		case 65:
+		case ENOPKG:
 			return "Package not installed";
-		case 66:
+		case EREMOTE:
 			return "Object is remote";
-		case 67:
+		case ENOLINK:
 			return "Link has been severed";
-		case 68:
+		case EADV:
 			return "Advertise error";
-		case 69:
+		case ESRMNT:
 			return "Srmount error";
-		case 70:
+		case ECOMM:
 			return "Communication error on send";
-		case 71:
+		case EPROTO:
 			return "Protocol error";
-		case 72:
+		case EMULTIHOP:
 			return "Multihop attempted";
-		case 73:
+		case EDOTDOT:
 			return "RFS specific error";
-		case 74:
+		case EBADMSG:
 			return "Bad message";
-		case 75:
+		case EOVERFLOW:
 			return "Value too large for defined data type";
-		case 76:
+		case ENOTUNIQ:
 			return "Name not unique on network";
-		case 77:
+		case EBADFD:
 			return "File descriptor in bad state";
-		case 78:
+		case EREMCHG:
 			return "Remote address changed";
-		case 79:
+		case ELIBACC:
 			return "Can not access a needed shared library";
-		case 80:
+		case ELIBBAD:
 			return "Accessing a corrupted shared library";
-		case 81:
+		case ELIBSCN:
 			return ".lib section in a.out corrupted";
-		case 82:
+		case ELIBMAX:
 			return "Attempting to link in too many shared libraries";
-		case 83:
+		case ELIBEXEC:
 			return "Cannot exec a shared library directly";
-		case 84:
+		case EILSEQ:
 			return "Invalid or incomplete multibyte or wide character";
-		case 85:
+		case ERESTART:
 			return "Interrupted system call should be restarted";
-		case 86:
+		case ESTRPIPE:
 			return "Streams pipe error";
-		case 87:
+		case EUSERS:
 			return "Too many users";
-		case 88:
+		case ENOTSOCK:
 			return "Socket operation on non-socket";
-		case 89:
+		case EDESTADDRREQ:
 			return "Destination address required";
-		case 90:
+		case EMSGSIZE:
 			return "Message too long";
-		case 91:
+		case EPROTOTYPE:
 			return "Protocol wrong type for socket";
-		case 92:
+		case ENOPROTOOPT:
 			return "Protocol not available";
-		case 93:
+		case EPROTONOSUPPORT:
 			return "Protocol not supported";
-		case 94:
+		case ESOCKTNOSUPPORT:
 			return "Socket type not supported";
-		case 95:
+		case EOPNOTSUPP:
 			return "Operation not supported";
-		case 96:
+		case EPFNOSUPPORT:
 			return "Protocol family not supported";
-		case 97:
+		case EAFNOSUPPORT:
 			return "Address family not supported by protocol";
-		case 98:
+		case EADDRINUSE:
 			return "Address already in use";
-		case 99:
+		case EADDRNOTAVAIL:
 			return "Cannot assign requested address";
-		case 100:
+		case ENETDOWN:
 			return "Network is down";
-		case 101:
+		case ENETUNREACH:
 			return "Network is unreachable";
-		case 102:
+		case ENETRESET:
 			return "Network dropped connection on reset";
-		case 103:
+		case ECONNABORTED:
 			return "Software caused connection abort";
-		case 104:
+		case ECONNRESET:
 			return "Connection reset by peer";
-		case 105:
+		case ENOBUFS:
 			return "No buffer space available";
-		case 106:
+		case EISCONN:
 			return "Transport endpoint is already connected";
-		case 107:
+		case ENOTCONN:
 			return "Transport endpoint is not connected";
-		case 108:
+		case ESHUTDOWN:
 			return "Cannot send after transport endpoint shutdown";
-		case 109:
+		case ETOOMANYREFS:
 			return "Too many references: cannot splice";
-		case 110:
+		case ETIMEDOUT:
 			return "Connection timed out";
-		case 111:
+		case ECONNREFUSED:
 			return "Connection refused";
-		case 112:
+		case EHOSTDOWN:
 			return "Host is down";
-		case 113:
+		case EHOSTUNREACH:
 			return "No route to host";
-		case 114:
+		case EALREADY:
 			return "Operation already in progress";
-		case 115:
+		case EINPROGRESS:
 			return "Operation now in progress";
-		case 116:
+		case ESTALE:
 			return "Stale file handle";
-		case 117:
+		case EUCLEAN:
 			return "Structure needs cleaning";
-		case 118:
+		case ENOTNAM:
 			return "Not a XENIX named type file";
-		case 119:
+		case ENAVAIL:
 			return "No XENIX semaphores available";
-		case 120:
+		case EISNAM:
 			return "Is a named type file";
-		case 121:
+		case EREMOTEIO:
 			return "Remote I/O error";
-		case 122:
+		case EDQUOT:
 			return "Disk quota exceeded";
-		case 123:
+		case ENOMEDIUM:
 			return "No medium found";
-		case 124:
+		case EMEDIUMTYPE:
 			return "Wrong medium type";
-		case 125:
+		case ECANCELED:
 			return "Operation canceled";
-		case 126:
+		case ENOKEY:
 			return "Required key not available";
-		case 127:
+		case EKEYEXPIRED:
 			return "Key has expired";
-		case 128:
+		case EKEYREVOKED:
 			return "Key has been revoked";
-		case 129:
+		case EKEYREJECTED:
 			return "Key was rejected by service";
-		case 130:
+		case EOWNERDEAD:
 			return "Owner died";
-		case 131:
+		case ENOTRECOVERABLE:
 			return "State not recoverable";
-		case 132:
+		case ERFKILL:
 			return "Operation not possible due to RF-kill";
-		case 133:
+		case EHWPOISON:
 			return "Memory page has hardware error";
 		default:
 			return "Unknown error";
 	}
 }
-
 const char *ft_gai_strerror(int errcode)
 {
 	switch (errcode) {
@@ -287,27 +289,27 @@ const char *ft_gai_strerror(int errcode)
 			return "Request canceled";
 		case -100:
 			return "Processing request in progress";
-		case -11:
+		case EAI_SYSTEM:
 			return "System error";
-		case -10:
+		case EAI_MEMORY:
 			return "Memory allocation failure";
 		case -9:
 			return "Address family for hostname not supported";
-		case -8:
+		case EAI_SERVICE:
 			return "Servname not supported for ai_socktype";
-		case -7:
+		case EAI_SOCKTYPE:
 			return "ai_socktype not supported";
-		case -6:
+		case EAI_FAMILY:
 			return "ai_family not supported";
 		case -5:
 			return "No address associated with hostname";
-		case -4:
+		case EAI_FAIL:
 			return "Non-recoverable failure in name resolution";
-		case -3:
+		case EAI_AGAIN:
 			return "Temporary failure in name resolution";
-		case -2:
+		case EAI_NONAME:
 			return "Name or service not known";
-		case -1:
+		case EAI_BADFLAGS:
 			return "Bad value for ai_flags";
 		default:
 			return "Unknown error";
