@@ -83,7 +83,7 @@ static int parse_args(const char *const args[])
 	bool is_destination_initialized = false;
 	while (*args != NULL) {
 		const char *arg = *args;
-		if (arg[0] == '-') {
+		if (arg[0] == '-' && arg[1] != '\0') {
 			arg++;
 			while (*arg != '\0') {
 				switch (*arg) {
