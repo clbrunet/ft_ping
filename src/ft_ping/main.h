@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#define EWMA_FACTOR 8
+
 typedef struct
 {
 	struct sockaddr_in sockaddr_in;

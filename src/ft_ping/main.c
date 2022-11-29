@@ -83,7 +83,7 @@ static void quit_handler(int signum)
 	double avg = g_ping.rtt_sum / g_ping.received_packets_count;
 	print_double(avg, 3);
 	print_char('/');
-	print_double(g_ping.ewma / 8, 3);
+	print_double(g_ping.ewma / EWMA_FACTOR, 3);
 	print_char('/');
 	print_double(g_ping.max_rtt, 3);
 	print_string(" ms\n");
