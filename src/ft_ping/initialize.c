@@ -80,7 +80,7 @@ static void invalid_option(char c)
 
 static int parse_args(const char *const args[])
 {
-	bool is_destination_initialized = false;
+	const char *destination_arg = NULL;
 	while (*args != NULL) {
 		const char *arg = *args;
 		if (arg[0] == '-' && arg[1] != '\0') {
@@ -99,20 +99,20 @@ static int parse_args(const char *const args[])
 				arg++;
 			}
 		} else {
-			if (is_destination_initialized) {
+			if (destination_arg != NULL) {
 				print_error("usage error", "Too many destination addresses");
 				return -1;
 			}
-			if (initialize_destination(&g_ping.destination, arg) == -1) {
-				return -1;
-			}
-			is_destination_initialized = true;
+			destination_arg = arg;
 		}
 		args++;
 	}
-	if (is_destination_initialized == false) {
+	if (destination_arg == NULL) {
 		print_error("usage error", ft_strerror(EDESTADDRREQ));
 		exit(1);
+	}
+	if (initialize_destination(&g_ping.destination, destination_arg) == -1) {
+		return -1;
 	}
 	return 0;
 }
