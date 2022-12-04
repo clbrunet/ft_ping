@@ -8,7 +8,7 @@
 #include <sys/time.h>
 #include <string.h>
 #include <errno.h>
-#include <netinet/ip_icmp.h>
+#include <linux/icmp.h>
 
 #include "ft_ping/icmp.h"
 #include "ft_ping/main.h"
@@ -57,7 +57,7 @@ int update_icmp_request(void)
 	icmphdr->un.echo.sequence = ft_htons(ft_ntohs(icmphdr->un.echo.sequence) + 1);
 
 	uint8_t *payload = (uint8_t *)(icmphdr + 1);
-	if (g_ping.icmp_request_payload_size >= sizeof(struct timeval)) {
+	if (g_ping.icmp_payload_size >= sizeof(struct timeval)) {
 		if (gettimeofday((struct timeval *)payload, NULL) == -1) {
 			print_error("gettimeofday", ft_strerror(errno));
 			return -1;
@@ -65,14 +65,14 @@ int update_icmp_request(void)
 	}
 
 	icmphdr->checksum = 0;
-	icmphdr->checksum = get_checksum(icmphdr, ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size));
+	icmphdr->checksum = get_checksum(icmphdr, ICMP_PACKET_SIZE(g_ping.icmp_payload_size));
 	return 0;
 }
 
 int send_icmp_request(void)
 {
 	if (sendto(g_ping.socket_fd, g_ping.icmp_request,
-			ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size), 0,
+			ICMP_PACKET_SIZE(g_ping.icmp_payload_size), 0,
 			(const struct sockaddr *)&g_ping.destination.sockaddr_in,
 			sizeof(struct sockaddr_in)) == -1) {
 		print_error("sendto", ft_strerror(errno));
@@ -81,7 +81,7 @@ int send_icmp_request(void)
 	return 0;
 }
 
-bool is_icmphdr_valid(struct icmphdr *icmphdr, size_t payload_size,
+bool is_icmphdr_valid(struct icmphdr *icmphdr, size_t size,
 		uint8_t expected_type, uint16_t expected_id)
 {
 	if (icmphdr->type != expected_type) {
@@ -90,7 +90,7 @@ bool is_icmphdr_valid(struct icmphdr *icmphdr, size_t payload_size,
 	if (icmphdr->code != 0) {
 		return false;
 	}
-	if (is_checksum_valid(icmphdr, ICMP_PACKET_SIZE(payload_size), &icmphdr->checksum) != true) {
+	if (is_checksum_valid(icmphdr, size, &icmphdr->checksum) != true) {
 		return false;
 	}
 	if (ft_ntohs(icmphdr->un.echo.id) != expected_id) {

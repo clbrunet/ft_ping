@@ -1,4 +1,4 @@
-#include <netinet/ip_icmp.h>
+#include <linux/icmp.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
 	signal(SIGALRM, &alarm_handler);
 
 	printf("PING %s (%s) %zu(%zu) bytes of data.\n", g_ping.destination.name,
-			g_ping.destination.ip, g_ping.icmp_request_payload_size,
-			IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_request_payload_size)));
+			g_ping.destination.ip, g_ping.icmp_payload_size,
+			IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_payload_size)));
 
 	alarm_handler(SIGALRM);
 

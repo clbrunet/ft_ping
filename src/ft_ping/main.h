@@ -20,7 +20,7 @@ typedef struct
 typedef struct
 {
 	const char *program_name;
-	size_t icmp_request_payload_size;
+	size_t icmp_payload_size;
 	bool is_verbose;
 	destination_t destination;
 
