@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
@@ -14,11 +15,14 @@
 
 int recv_loop(void)
 {
+	struct sockaddr_in name;
 	struct iovec msg_iov[1] = {
 		[0].iov_base = g_ping.icmp_reply_buf,
 		[0].iov_len = g_ping.icmp_reply_buf_size,
 	};
 	struct msghdr msg = {
+		.msg_name = &name,
+		.msg_namelen = sizeof(struct sockaddr_in),
 		.msg_iov = msg_iov,
 		.msg_iovlen = 1,
 	};
@@ -49,14 +53,9 @@ int recv_loop(void)
 			continue;
 		}
 		g_ping.received_packets_count++;
-		printf("%lu bytes from ", ret - sizeof(struct iphdr));
-		if (has_ip_format(g_ping.destination.name)) {
-			printf("%s: ", g_ping.destination.ip);
-		} else {
-			printf("%s (%s): ", g_ping.destination.name, g_ping.destination.ip);
-		}
-		printf("icmp_seq=%hu ttl=%hhu", ft_ntohs(response_icmphdr->un.echo.sequence),
-				response_iphdr->ttl);
+		char ip[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, (const void *)&name.sin_addr, ip, INET_ADDRSTRLEN);
+		char time_suffix[30] = {0};
 		if (g_ping.icmp_request_payload_size >= sizeof(struct timeval)) {
 			struct timeval *sending_tv = (struct timeval *)(response_icmphdr + 1);
 			struct timeval diff_tv = {
@@ -87,8 +86,9 @@ int recv_loop(void)
 			} else {
 				ms_precision = 0;
 			}
-			printf(" time=%.*f ms", ms_precision, ms);
+			snprintf(time_suffix, sizeof(time_suffix), " time=%.*f ms", ms_precision, ms);
 		}
-		printf("\n");
+		printf("%lu bytes from %s: icmp_seq=%hu ttl=%hhu%s\n", ret - sizeof(struct iphdr), ip,
+				ft_ntohs(response_icmphdr->un.echo.sequence), response_iphdr->ttl, time_suffix);
 	}
 }
