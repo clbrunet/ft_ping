@@ -1,6 +1,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,13 +14,16 @@
 #include <netdb.h>
 #include <float.h>
 #include <linux/filter.h>
+#include <limits.h>
 
 #include "ft_ping/initialize.h"
 #include "ft_ping/main.h"
+#include "ft_ping/utils/ctype.h"
 #include "ft_ping/utils/error.h"
 #include "ft_ping/utils/print.h"
 #include "ft_ping/icmp.h"
 #include "ft_ping/utils/string.h"
+#include "ft_ping/parsing.h"
 
 static int initialize_socket()
 {
@@ -39,98 +43,11 @@ static int initialize_socket()
 	return 0;
 }
 
-static int initialize_destination(destination_t *destination, const char *destination_arg)
-{
-	assert(destination != NULL);
-	assert(destination_arg != NULL);
-
-	struct addrinfo hints = {
-		.ai_family = AF_INET,
-		.ai_socktype = SOCK_RAW,
-		.ai_protocol = IPPROTO_ICMP,
-		.ai_flags = AI_CANONNAME,
-	};
-	struct addrinfo *res;
-	int error_code = getaddrinfo(destination_arg, NULL, &hints, &res);
-	if (error_code != 0) {
-		print_error(destination_arg, ft_gai_strerror(error_code));
-		return -1;
-    }
-	destination->sockaddr_in = *(struct sockaddr_in *)res->ai_addr;
-	ft_strlcpy(destination->name, res->ai_canonname, NI_MAXHOST);
-	inet_ntop(AF_INET, (const void *)&destination->sockaddr_in.sin_addr,
-			destination->ip, INET_ADDRSTRLEN);
-	freeaddrinfo(res);
-	return 0;
-}
-
-static void usage(void)
-{
-	printf(
-			"\n"
-			"Usage\n"
-			"  ft_ping [options] <destination>\n"
-			"\n"
-			"Options:\n"
-			"  <destination>   dns name or ip adress\n"
-			"  -h              print help and exit\n"
-			"  -v              verbose output\n"
-		  );
-	exit(2);
-}
-
-static void invalid_option(char c)
-{
-	printf("ft_ping: invalid option -- '%c'\n", c);
-	usage();
-}
-
-static int parse_args(const char *const args[])
-{
-	const char *destination_arg = NULL;
-	while (*args != NULL) {
-		const char *arg = *args;
-		if (arg[0] == '-' && arg[1] != '\0') {
-			arg++;
-			while (*arg != '\0') {
-				switch (*arg) {
-					case 'h':
-						usage();
-						break;
-					case 'v':
-						g_ping.is_verbose = true;
-						break;
-					default:
-						invalid_option(*arg);
-				}
-				arg++;
-			}
-		} else {
-			if (destination_arg != NULL) {
-				print_error("usage error", "Too many destination addresses");
-				return -1;
-			}
-			destination_arg = arg;
-		}
-		args++;
-	}
-	if (destination_arg == NULL) {
-		print_error("usage error", ft_strerror(EDESTADDRREQ));
-		exit(1);
-	}
-	if (initialize_destination(&g_ping.destination, destination_arg) == -1) {
-		return -1;
-	}
-	return 0;
-}
-
 int initialize(const char *const argv[])
 {
 	assert(argv != NULL);
 
 	g_ping.program_name = argv[0];
-	g_ping.icmp_payload_size = 56;
-	g_ping.is_verbose = false;
 	if (parse_args(argv + 1) == -1) {
 		return -1;
 	}
