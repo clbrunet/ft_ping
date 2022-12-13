@@ -70,7 +70,7 @@ static void quit_handler(int signum)
 	print_number(g_ping.received_packets_count);
 	print_char('/');
 	print_number(g_ping.transmitted_packets_count);
-	print_string(", ");
+	print_string(" packets, ");
 	double packet_loss_percent = 100;
 	if (g_ping.transmitted_packets_count != 0) {
 		packet_loss_percent = 100 - 100 * ((double)g_ping.received_packets_count
