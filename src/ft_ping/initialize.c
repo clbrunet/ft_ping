@@ -34,10 +34,18 @@ static int initialize_socket()
 	}
 	int recverr = 1;
 	if (setsockopt(g_ping.socket_fd, SOL_IP, IP_RECVERR, &recverr, sizeof(int)) == -1) {
+		print_error("setsockopt", ft_strerror(errno));
 		return -1;
+	}
+	if (g_ping.is_ttl_specified) {
+		if (setsockopt(g_ping.socket_fd, SOL_IP, IP_TTL, &g_ping.ttl, sizeof(int)) == -1) {
+			print_error("cannot set unicast time-to-live", ft_strerror(errno));
+			return -1;
+		}
 	}
 	struct icmp_filter filter = { .data = ~(1 << ICMP_ECHOREPLY) };
 	if (setsockopt(g_ping.socket_fd, SOL_RAW, ICMP_FILTER, &filter, sizeof(struct icmp_filter)) == -1) {
+		print_error("setsockopt", ft_strerror(errno));
 		return -1;
 	}
 	return 0;

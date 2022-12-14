@@ -6,11 +6,11 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-#include "main.h"
-#include "utils/ctype.h"
-#include "utils/print.h"
-#include "utils/error.h"
-#include "utils/string.h"
+#include "ft_ping/main.h"
+#include "ft_ping/utils/ctype.h"
+#include "ft_ping/utils/print.h"
+#include "ft_ping/utils/error.h"
+#include "ft_ping/utils/string.h"
 
 static void usage(void)
 {
@@ -117,7 +117,9 @@ int parse_args(const char *const args[])
 {
 	g_ping.icmp_payload_size = 56;
 	g_ping.is_verbose = false;
-	g_ping.ttl = 0;
+	g_ping.is_ttl_specified = false;
+	g_ping.ttl = 255;
+
 	const char *destination_arg = NULL;
 	while (*args != NULL) {
 		const char *arg = *args;
@@ -140,6 +142,7 @@ int parse_args(const char *const args[])
 					g_ping.is_verbose = true;
 					break;
 				case 't':
+					g_ping.is_ttl_specified = true;
 					arg++;
 					if (*arg == '\0') {
 						args++;

@@ -22,7 +22,8 @@ typedef struct
 	const char *program_name;
 	size_t icmp_payload_size;
 	bool is_verbose;
-	uint8_t ttl;
+	bool is_ttl_specified;
+	int ttl;
 	destination_t destination;
 
 	int socket_fd;
