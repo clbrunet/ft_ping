@@ -82,7 +82,12 @@ static void quit_handler(int signum)
 				/ (double)g_ping.transmitted_packets_count);
 	}
 	print_number(packet_loss_percent);
-	print_string("% loss, min/avg/ewma/max = ");
+	print_string("% loss");
+	if (g_ping.received_packets_count == 0) {
+		print_char('\n');
+		return;
+	}
+	print_string(", min/avg/ewma/max = ");
 	print_double(g_ping.min_rtt, 3);
 	print_char('/');
 	double avg = g_ping.rtt_sum / g_ping.received_packets_count;
