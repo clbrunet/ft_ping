@@ -32,6 +32,11 @@ static void interrupt_handler(int signum)
 	print_string(" packets transmitted, ");
 	print_number(g_ping.received_packets_count);
 	print_string(" received, ");
+	if (g_ping.error_packets_count != 0) {
+		print_char('+');
+		print_number(g_ping.error_packets_count);
+		print_string(" errors, ");
+	}
 	double packet_loss_percent = 100;
 	if (g_ping.transmitted_packets_count != 0) {
 		packet_loss_percent = 100 - 100 * ((double)g_ping.received_packets_count

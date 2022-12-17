@@ -34,6 +34,7 @@ typedef struct
 
 	size_t transmitted_packets_count;
 	size_t received_packets_count;
+	size_t error_packets_count;
 	struct timeval first_sending_time;
 	size_t ms_from_first_sending_time;
 	double min_rtt;

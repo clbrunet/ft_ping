@@ -40,6 +40,7 @@ int recv_error(void)
 		print_error("recvmsg", ft_strerror(errno));
 		return -1;
 	}
+	g_ping.error_packets_count++;
 	if (!g_ping.is_verbose) {
 		return 0;
 	}

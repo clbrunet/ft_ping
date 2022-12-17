@@ -80,6 +80,7 @@ int initialize(const char *const argv[])
 
 	g_ping.transmitted_packets_count = 0;
 	g_ping.received_packets_count = 0;
+	g_ping.error_packets_count = 0;
 	g_ping.ms_from_first_sending_time = 0;
 	g_ping.min_rtt = DBL_MAX;
 	g_ping.rtt_sum = 0.0;
