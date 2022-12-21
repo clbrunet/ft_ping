@@ -22,7 +22,6 @@ ping_t g_ping = {0};
 static void interrupt_handler(int signum)
 {
 	(void)signum;
-	int exit_status = 0;
 
 	print_string("\n--- ");
 	print_string(g_ping.destination.name);
@@ -48,23 +47,28 @@ static void interrupt_handler(int signum)
 	print_string("ms\n");
 	if (g_ping.received_packets_count == 0) {
 		print_char('\n');
-		exit_status = 1;
-	} else {
-		print_string("rtt min/avg/max/mdev = ");
-		print_double(g_ping.min_rtt, 3);
-		print_char('/');
-		double avg = g_ping.rtt_sum / g_ping.received_packets_count;
-		print_double(avg, 3);
-		print_char('/');
-		print_double(g_ping.max_rtt, 3);
-		print_char('/');
-		// Standard deviation formula : https://www.brainkart.com/article/Calculation-of-Standard-Deviation_39437/
-		double mdev = ft_sqrt(g_ping.squared_rtt_sum / g_ping.received_packets_count - (avg * avg));
-		print_double(mdev, 3);
-		print_string(" ms\n");
+		terminate();
+		exit(1);
 	}
+	if (g_ping.icmp_payload_size < sizeof(struct timeval)) {
+		print_char('\n');
+		terminate();
+		exit(0);
+	}
+	print_string("rtt min/avg/max/mdev = ");
+	print_double(g_ping.min_rtt, 3);
+	print_char('/');
+	double avg = g_ping.rtt_sum / g_ping.received_packets_count;
+	print_double(avg, 3);
+	print_char('/');
+	print_double(g_ping.max_rtt, 3);
+	print_char('/');
+	// Standard deviation formula : https://www.brainkart.com/article/Calculation-of-Standard-Deviation_39437/
+	double mdev = ft_sqrt(g_ping.squared_rtt_sum / g_ping.received_packets_count - (avg * avg));
+	print_double(mdev, 3);
+	print_string(" ms\n");
 	terminate();
-	exit(exit_status);
+	exit(0);
 }
 
 static void quit_handler(int signum)
@@ -83,7 +87,8 @@ static void quit_handler(int signum)
 	}
 	print_number(packet_loss_percent);
 	print_string("% loss");
-	if (g_ping.received_packets_count == 0) {
+	if (g_ping.received_packets_count == 0
+		|| g_ping.icmp_payload_size < sizeof(struct timeval)) {
 		print_char('\n');
 		return;
 	}

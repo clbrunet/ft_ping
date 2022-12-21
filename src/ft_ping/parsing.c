@@ -23,6 +23,7 @@ static void usage(void)
 			"  <destination>   dns name or ip adress\n"
 			"  -h              print help and exit\n"
 			"  -v              verbose output\n"
+			"  -s <size>       use <size> as number of data bytes to be sent\n"
 			"  -t <ttl>        define time to live\n"
 		  );
 	exit(2);
@@ -156,6 +157,15 @@ int parse_args(const char *const args[])
 						arg = *args;
 					}
 					g_ping.ttl = parse_uint8(&arg);
+					arg--;
+					break;
+				case 's':
+					arg++;
+					if (*arg == '\0') {
+						args++;
+						arg = *args;
+					}
+					g_ping.icmp_payload_size = parse_range(&arg, 0, INT32_MAX);
 					arg--;
 					break;
 				default:
