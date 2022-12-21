@@ -58,7 +58,9 @@ int recv_error(void)
 			} else {
 				inet_ntop(AF_INET, (const void *)&name.sin_addr, ip, INET_ADDRSTRLEN);
 			}
-			printf("From %s: icmp_seq=%u type=%u code=%u\n", ip, 0, ee->ee_type, ee->ee_code); // TODO: add icmp_seq
+			struct icmphdr *icmphdr = (struct icmphdr *)msg_iov->iov_base;
+			printf("From %s: icmp_seq=%u type=%u code=%u\n", ip,
+					ft_ntohs(icmphdr->un.echo.sequence), ee->ee_type, ee->ee_code);
 			break;
 		}
 	}
