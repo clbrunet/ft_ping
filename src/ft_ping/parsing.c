@@ -78,14 +78,21 @@ static int64_t parse_int64(const char **arg)
 	return res;
 }
 
-static uint8_t parse_uint8(const char **arg)
+static uint64_t parse_range(const char **arg, int64_t lower_bound, int64_t upper_bound)
 {
 	const char *backup = *arg;
 	int64_t res = parse_int64(arg);
-	if (!(0 <= res && res <= UINT8_MAX)) {
-		invalid_argument(backup, "out of range: 0 <= value <= 255");
+	if (!(lower_bound <= res && res <= upper_bound)) {
+		char description[256];
+		snprintf(description, sizeof(description), "out of range: %ld <= value <= %ld", lower_bound, upper_bound);
+		invalid_argument(backup, description);
 	}
-	return (uint8_t)res;
+	return res;
+}
+
+static uint8_t parse_uint8(const char **arg)
+{
+	return parse_range(arg, 0, UINT8_MAX);
 }
 
 static int parse_destination(destination_t *destination, const char *destination_arg)
