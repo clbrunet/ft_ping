@@ -20,8 +20,9 @@ typedef struct
 typedef struct
 {
 	const char *program_name;
-	size_t icmp_payload_size;
+	bool should_print_timestamp;
 	bool is_verbose;
+	size_t icmp_payload_size;
 	bool is_ttl_specified;
 	int ttl;
 	destination_t destination;

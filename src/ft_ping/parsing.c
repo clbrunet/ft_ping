@@ -21,6 +21,7 @@ static void usage(void)
 			"\n"
 			"Options:\n"
 			"  <destination>   dns name or ip adress\n"
+			"  -D              print timestamps\n"
 			"  -h              print help and exit\n"
 			"  -v              verbose output\n"
 			"  -s <size>       use <size> as number of data bytes to be sent\n"
@@ -123,8 +124,9 @@ static int parse_destination(destination_t *destination, const char *destination
 
 int parse_args(const char *const args[])
 {
-	g_ping.icmp_payload_size = 56;
+	g_ping.should_print_timestamp = false;
 	g_ping.is_verbose = false;
+	g_ping.icmp_payload_size = 56;
 	g_ping.is_ttl_specified = false;
 	g_ping.ttl = 255;
 
@@ -143,11 +145,23 @@ int parse_args(const char *const args[])
 		arg++;
 		while (*arg != '\0') {
 			switch (*arg) {
+				case 'D':
+					g_ping.should_print_timestamp = true;
+					break;
 				case 'h':
 					usage();
 					break;
 				case 'v':
 					g_ping.is_verbose = true;
+					break;
+				case 's':
+					arg++;
+					if (*arg == '\0') {
+						args++;
+						arg = *args;
+					}
+					g_ping.icmp_payload_size = parse_range(&arg, 0, INT32_MAX);
+					arg--;
 					break;
 				case 't':
 					g_ping.is_ttl_specified = true;
@@ -157,15 +171,6 @@ int parse_args(const char *const args[])
 						arg = *args;
 					}
 					g_ping.ttl = parse_uint8(&arg);
-					arg--;
-					break;
-				case 's':
-					arg++;
-					if (*arg == '\0') {
-						args++;
-						arg = *args;
-					}
-					g_ping.icmp_payload_size = parse_range(&arg, 0, INT32_MAX);
 					arg--;
 					break;
 				default:

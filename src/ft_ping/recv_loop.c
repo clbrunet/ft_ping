@@ -90,11 +90,9 @@ int recv_icmp_reply(void)
 		return 0;
 	}
 	struct timeval current_tv;
-	if (g_ping.icmp_payload_size >= sizeof(struct timeval)) {
-		if (gettimeofday(&current_tv, NULL) == -1) {
-			print_error("gettimeofday", ft_strerror(errno));
-			return -1;
-		}
+	if (gettimeofday(&current_tv, NULL) == -1) {
+		print_error("gettimeofday", ft_strerror(errno));
+		return -1;
 	}
 	if ((size_t)ret != IPV4_PACKET_SIZE(ICMP_PACKET_SIZE(g_ping.icmp_payload_size))) {
 		return 0;
@@ -109,6 +107,11 @@ int recv_icmp_reply(void)
 		return 0;
 	}
 	g_ping.received_packets_count++;
+	char timestamp_prefix[30] = {0};
+	if (g_ping.should_print_timestamp) {
+		snprintf(timestamp_prefix, sizeof(timestamp_prefix), "[%ld.%ld] ",
+				current_tv.tv_sec, current_tv.tv_usec);
+	}
 	char ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, (const void *)&name.sin_addr, ip, INET_ADDRSTRLEN);
 	char time_suffix[30] = {0};
@@ -144,8 +147,9 @@ int recv_icmp_reply(void)
 		}
 		snprintf(time_suffix, sizeof(time_suffix), " time=%.*f ms", ms_precision, ms);
 	}
-	printf("%lu bytes from %s: icmp_seq=%hu ttl=%hhu%s\n", ret - sizeof(struct iphdr), ip,
-			ft_ntohs(response_icmphdr->un.echo.sequence), response_iphdr->ttl, time_suffix);
+	printf("%s%lu bytes from %s: icmp_seq=%hu ttl=%hhu%s\n", timestamp_prefix,
+			ret - sizeof(struct iphdr), ip, ft_ntohs(response_icmphdr->un.echo.sequence),
+			response_iphdr->ttl, time_suffix);
 	return 0;
 }
 
