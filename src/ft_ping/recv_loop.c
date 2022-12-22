@@ -109,7 +109,7 @@ int recv_icmp_reply(void)
 	g_ping.received_packets_count++;
 	char timestamp_prefix[30] = {0};
 	if (g_ping.should_print_timestamp) {
-		snprintf(timestamp_prefix, sizeof(timestamp_prefix), "[%ld.%ld] ",
+		snprintf(timestamp_prefix, sizeof(timestamp_prefix), "[%ld.%06ld] ",
 				current_tv.tv_sec, current_tv.tv_usec);
 	}
 	char ip[INET_ADDRSTRLEN];
