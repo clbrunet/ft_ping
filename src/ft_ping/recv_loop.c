@@ -42,7 +42,7 @@ int recv_error(void)
 		return -1;
 	}
 	g_ping.error_packets_count++;
-	if (!g_ping.is_verbose) {
+	if (!g_ping.is_verbose || g_ping.is_quiet) {
 		return 0;
 	}
 	struct cmsghdr *cmsg;
@@ -148,9 +148,11 @@ int recv_icmp_reply(void)
 		}
 		snprintf(time_suffix, sizeof(time_suffix), " time=%.*f ms", ms_precision, ms);
 	}
-	printf("%s%lu bytes from %s: icmp_seq=%hu ttl=%hhu%s\n", timestamp_prefix,
-			ret - sizeof(struct iphdr), ip, ft_ntohs(response_icmphdr->un.echo.sequence),
-			response_iphdr->ttl, time_suffix);
+	if (!g_ping.is_quiet) {
+		printf("%s%lu bytes from %s: icmp_seq=%hu ttl=%hhu%s\n", timestamp_prefix,
+				ret - sizeof(struct iphdr), ip, ft_ntohs(response_icmphdr->un.echo.sequence),
+				response_iphdr->ttl, time_suffix);
+	}
 	if (g_ping.packet_count != 0 && (size_t)g_ping.packet_count == g_ping.received_packets_count) {
 		interrupt_handler(SIGINT);
 	}

@@ -22,6 +22,7 @@ typedef struct
 	const char *program_name;
 	int64_t packet_count;
 	bool should_print_timestamp;
+	bool is_quiet;
 	bool is_verbose;
 	size_t icmp_payload_size;
 	bool is_ttl_specified;

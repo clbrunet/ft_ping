@@ -24,6 +24,7 @@ static void usage(void)
 			"  -c <count>      stop after <count> replies\n"
 			"  -D              print timestamps\n"
 			"  -h              print help and exit\n"
+			"  -q              quiet output\n"
 			"  -v              verbose output\n"
 			"  -s <size>       use <size> as number of data bytes to be sent\n"
 			"  -t <ttl>        define time to live\n"
@@ -127,6 +128,7 @@ int parse_args(const char *const args[])
 {
 	g_ping.packet_count = 0;
 	g_ping.should_print_timestamp = false;
+	g_ping.is_quiet = false;
 	g_ping.is_verbose = false;
 	g_ping.icmp_payload_size = 56;
 	g_ping.is_ttl_specified = false;
@@ -161,6 +163,9 @@ int parse_args(const char *const args[])
 					break;
 				case 'h':
 					usage();
+					break;
+				case 'q':
+					g_ping.is_quiet = true;
 					break;
 				case 'v':
 					g_ping.is_verbose = true;
