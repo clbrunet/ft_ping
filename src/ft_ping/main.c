@@ -144,10 +144,13 @@ static void alarm_handler(int signum)
 int main(int argc, char *argv[])
 {
 	(void)argc;
+	if (getuid() != 0) {
+		printf("%s: usage error: Root permissions required\n", argv[0]);
+		return 1;
+	}
 	if (initialize((const char *const *)argv) == -1) {
 		return 2;
 	}
-
 	signal(SIGINT, &interrupt_handler);
 	signal(SIGQUIT, &quit_handler);
 	signal(SIGALRM, &alarm_handler);

@@ -138,7 +138,7 @@ int parse_args(const char *const args[])
 		if (!(arg[0] == '-' && arg[1] != '\0')) {
 			if (destination_arg != NULL) {
 				print_error("usage error", "Too many destination addresses");
-				return -1;
+				exit(1);
 			}
 			destination_arg = arg;
 			args++;
