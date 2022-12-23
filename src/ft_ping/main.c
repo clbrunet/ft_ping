@@ -19,7 +19,7 @@
 
 ping_t g_ping = {0};
 
-static void interrupt_handler(int signum)
+void interrupt_handler(int signum)
 {
 	(void)signum;
 
@@ -108,6 +108,9 @@ static void alarm_handler(int signum)
 {
 	(void)signum;
 
+	if (g_ping.should_stop_on_alarm) {
+		interrupt_handler(SIGINT);
+	}
 	update_icmp_request();
 	if (send_icmp_request() == -1) {
 		terminate();
@@ -132,6 +135,10 @@ static void alarm_handler(int signum)
 			+ (double)diff_from_first_reception_tv.tv_usec / 1000;
 	}
 	g_ping.transmitted_packets_count++;
+	if (g_ping.packet_count != 0 && (size_t)g_ping.packet_count == g_ping.transmitted_packets_count) {
+		g_ping.should_stop_on_alarm = true;
+		alarm(10);
+	}
 }
 
 int main(int argc, char *argv[])

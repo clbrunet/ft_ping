@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <netinet/ip.h>
 #include <linux/icmp.h>
+#include <signal.h>
 #include <stdint.h>
 #include <sys/time.h>
 #include <stdio.h>
@@ -150,6 +151,9 @@ int recv_icmp_reply(void)
 	printf("%s%lu bytes from %s: icmp_seq=%hu ttl=%hhu%s\n", timestamp_prefix,
 			ret - sizeof(struct iphdr), ip, ft_ntohs(response_icmphdr->un.echo.sequence),
 			response_iphdr->ttl, time_suffix);
+	if (g_ping.packet_count != 0 && (size_t)g_ping.packet_count == g_ping.received_packets_count) {
+		interrupt_handler(SIGINT);
+	}
 	return 0;
 }
 

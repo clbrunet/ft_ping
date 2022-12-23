@@ -21,6 +21,7 @@ static void usage(void)
 			"\n"
 			"Options:\n"
 			"  <destination>   dns name or ip adress\n"
+			"  -c <count>      stop after <count> replies\n"
 			"  -D              print timestamps\n"
 			"  -h              print help and exit\n"
 			"  -v              verbose output\n"
@@ -124,6 +125,7 @@ static int parse_destination(destination_t *destination, const char *destination
 
 int parse_args(const char *const args[])
 {
+	g_ping.packet_count = 0;
 	g_ping.should_print_timestamp = false;
 	g_ping.is_verbose = false;
 	g_ping.icmp_payload_size = 56;
@@ -145,6 +147,15 @@ int parse_args(const char *const args[])
 		arg++;
 		while (*arg != '\0') {
 			switch (*arg) {
+				case 'c':
+					arg++;
+					if (*arg == '\0') {
+						args++;
+						arg = *args;
+					}
+					g_ping.packet_count = parse_range(&arg, 1, INT64_MAX);
+					arg--;
+					break;
 				case 'D':
 					g_ping.should_print_timestamp = true;
 					break;

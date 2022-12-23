@@ -78,6 +78,7 @@ int initialize(const char *const argv[])
 		return -1;
 	}
 
+	g_ping.should_stop_on_alarm = false;
 	g_ping.transmitted_packets_count = 0;
 	g_ping.received_packets_count = 0;
 	g_ping.error_packets_count = 0;

@@ -20,6 +20,7 @@ typedef struct
 typedef struct
 {
 	const char *program_name;
+	int64_t packet_count;
 	bool should_print_timestamp;
 	bool is_verbose;
 	size_t icmp_payload_size;
@@ -33,6 +34,7 @@ typedef struct
 	size_t icmp_reply_buf_size;
 	uint8_t *icmp_reply_buf;
 
+	bool should_stop_on_alarm;
 	size_t transmitted_packets_count;
 	size_t received_packets_count;
 	size_t error_packets_count;
@@ -46,5 +48,7 @@ typedef struct
 } ping_t;
 
 extern ping_t g_ping;
+
+void interrupt_handler(int signum);
 
 #endif
