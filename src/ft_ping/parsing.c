@@ -25,9 +25,9 @@ static void usage(void)
 			"  -D              print timestamps\n"
 			"  -h              print help and exit\n"
 			"  -q              quiet output\n"
-			"  -v              verbose output\n"
 			"  -s <size>       use <size> as number of data bytes to be sent\n"
 			"  -t <ttl>        define time to live\n"
+			"  -v              verbose output\n"
 		  );
 	exit(2);
 }
